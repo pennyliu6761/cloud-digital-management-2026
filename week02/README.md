@@ -67,7 +67,8 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
 2. 頻道名稱輸入：`vip-報名警報`
 3. 點擊「**建立頻道**」
 
-<!-- 📸 截圖：vip-報名警報 頻道建立完成 -->
+<img width="478" height="524" alt="image" src="https://github.com/user-attachments/assets/195155a3-6439-43e6-935c-ce2e93c94246" />
+<img width="747" height="606" alt="image" src="https://github.com/user-attachments/assets/695fb1e0-af36-4ae1-b4ef-df3d9b7acba1" />
 
 ---
 
@@ -90,7 +91,7 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
 > https://discord.com/api/webhooks/1234567890/xxxxxxxxxxxxxxxxxxxxxxxx
 > ```
 
-<!-- 📸 截圖：Discord Webhook 設定頁面（URL 遮住後五碼） -->
+<img width="447" height="266" alt="image" src="https://github.com/user-attachments/assets/3865758e-7024-46b8-8e55-c3f943a98117" />
 
 > [!TIP]
 > **這個 URL 就是你的「推播管道入口」**
