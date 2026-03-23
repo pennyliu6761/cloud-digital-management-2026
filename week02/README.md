@@ -270,7 +270,8 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
 > 這就是**多路分流自動化**的基礎架構！
 
 <img width="1168" height="729" alt="image" src="https://github.com/user-attachments/assets/f4a7a5c1-e1c5-48bc-ac1e-401156453953" />
-<img width="890" height="774" alt="image" src="https://github.com/user-attachments/assets/5b6e9938-1e47-42d2-8260-8a9be2a32d81" />
+<img width="857" height="804" alt="image" src="https://github.com/user-attachments/assets/4ddd9f1d-c78f-404d-869f-54c28c3d046b" />
+
 
 > [!TIP]
 > **🏆 2 Checkpoint 完成！**
