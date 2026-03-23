@@ -152,7 +152,7 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
     | Label | `僅限 VIP 警報` |
     | Condition | `是否為VIP貴賓？` → `Equal to (text)` → `是` |
 
-<!-- 📸 截圖：Filter 設定畫面 -->
+<img width="845" height="482" alt="image" src="https://github.com/user-attachments/assets/94558880-28ce-4f3c-9916-821fc579a555" />
 
 > [!NOTE]
 > **這就是商業邏輯！**
@@ -166,6 +166,9 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
 1. 點擊過濾器右邊「**+**」
 2. 搜尋「**Discord**」→ 選擇「**Send a Message by Webhook Bot**」
 
+<img width="798" height="515" alt="image" src="https://github.com/user-attachments/assets/f608b723-a9fe-4910-9d70-54385e4d4ede" />
+<img width="784" height="518" alt="image" src="https://github.com/user-attachments/assets/f629bb12-c89e-4700-af66-abf29917bbf6" />
+
 > [!NOTE]
 > 找不到 Discord 模組？可改用通用方式：
 > 搜尋「**HTTP**」→「**Make a request**」→ Method 選 `POST`，URL 貼入 Webhook URL，Body type 選 `Raw`，Content type 選 `JSON`，Request content 填入訊息 JSON。效果完全相同，且適用所有支援 Webhook 的服務。
@@ -176,6 +179,8 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
     |---------|---------|
     | Webhook URL | 貼上任務 2-1 複製的 Discord Webhook URL |
     | Username | `營隊戰情機器人` |
+
+https://discord.com/api/webhooks/1485591726373601290/VwN8RWhGwz6mmzekXsoEsTplo3CF3tVj3XeFPdyYd3o4ffgwQMLBJCx9kAnf0EtTbttl
 
 4. **Content 欄位**組裝以下訊息（`{{ }}` 從左邊 Google Sheets 帶入動態變數）：
 ```
