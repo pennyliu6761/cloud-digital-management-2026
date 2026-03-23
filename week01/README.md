@@ -317,6 +317,7 @@
 
 
 4. **如果沒有上述畫面(非首次執行)，請透過以下方式建立Action**
+
    <img width="522" height="242" alt="image" src="https://github.com/user-attachments/assets/a015de7a-a482-4a80-a472-e806d1950782" />
 
    <img width="535" height="234" alt="image" src="https://github.com/user-attachments/assets/93a976d3-3a38-4c25-9f43-40cc6c18e756" />
