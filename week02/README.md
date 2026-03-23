@@ -253,7 +253,6 @@ Make 把複雜的 API 程式碼變成**視覺化拖拉節點**，讓不懂程式
 > | 安全風險 | URL 外洩即可被任何人使用 | Token 有效期限，較安全 |
 > | 教學價值 | 展示最純粹的 Webhook 概念 | 展示 OAuth 授權概念 |
 
-<img width="703" height="379" alt="image" src="https://github.com/user-attachments/assets/82629c87-93be-4c37-a3b0-f059e6adfe4b" />
 <img width="852" height="490" alt="image" src="https://github.com/user-attachments/assets/18e6c180-3c87-4aac-97dc-6abfbcb5d217" />
 
 ---
