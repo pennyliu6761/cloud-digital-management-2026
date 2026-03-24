@@ -456,16 +456,18 @@ Google 表單 → Apps Script（住在 Google 裡面）→ Discord
 2. 左側選單「**整合**」→「**Webhook**」
 3. 點擊「**新 Webhook**」
 
-    > [!WARNING]
-    > 必須點「新 Webhook」自己建立，才能複製 URL。
-    > 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
+   > [!WARNING]
+   > 必須點「新 Webhook」自己建立，才能複製 URL。
+   > 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
 
 4. 名稱填入對應頻道名稱（例如：`a場次報到機器人`）
 5. 確認頻道是正確的
 6. 點擊剛建立的 Webhook 展開 →「**複製 Webhook 網址**」
 7. 貼到記事本備用
 
-<!-- 📸 截圖：Discord Webhook 設定頁面，顯示複製網址按鈕 -->
+<img width="296" height="203" alt="image" src="https://github.com/user-attachments/assets/e5dbfc74-fd4a-414c-834b-22984ae24caa" />
+<img width="1032" height="639" alt="image" src="https://github.com/user-attachments/assets/7fd2ca2f-4f4b-4346-9f2d-72d20eaf8362" />
+
 
 ---
 
@@ -475,7 +477,7 @@ Google 表單 → Apps Script（住在 Google 裡面）→ Discord
 2. 上方選單「**擴充功能**」→「**Apps Script**」
 3. 會開啟一個程式碼編輯器
 
-<!-- 📸 截圖：Apps Script 編輯器畫面 -->
+<img width="743" height="294" alt="image" src="https://github.com/user-attachments/assets/47de2f3a-affc-4646-91c4-2c6920e2e052" />
 
 ---
 
@@ -575,6 +577,9 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 
 點擊上方「**💾 儲存**」（或 `Ctrl+S`）
 
+<img width="1019" height="827" alt="image" src="https://github.com/user-attachments/assets/05daf7af-39d5-4ddf-87c3-af1662c7df13" />
+<img width="802" height="420" alt="image" src="https://github.com/user-attachments/assets/11fcef63-9188-471f-ad07-5fd28928d9fe" />
+
 ---
 
 #### 步驟五：先用測試函式驗證
@@ -586,7 +591,8 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 - ✅ `#c場次報到` 收到新報名通知（因為測試資料場次 = C場）
 - ❌ `#a場次報到` 和 `#b場次報到` 不應該收到
 
-<!-- 📸 截圖：Discord 兩個頻道同時收到測試通知 -->
+<img width="311" height="235" alt="image" src="https://github.com/user-attachments/assets/dd1b5449-cddd-441b-9802-dda8fb012a97" />
+<img width="318" height="156" alt="image" src="https://github.com/user-attachments/assets/0ed022bb-cd85-49f1-96d3-0d9867a221cb" />
 
 ---
 
@@ -611,7 +617,8 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 4. 點擊「**儲存**」
 5. 跳出 Google 授權視窗 → 選擇你的帳號 → 點擊「**允許**」
 
-<!-- 📸 截圖：觸發條件設定完成畫面 -->
+<img width="279" height="319" alt="image" src="https://github.com/user-attachments/assets/acafd05a-5d5f-4920-9126-ac13bc0565c1" />
+<img width="1311" height="811" alt="image" src="https://github.com/user-attachments/assets/669ea511-7d0f-4761-8cd1-8859df98ed61" />
 
 ---
 
@@ -628,7 +635,7 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 - ✅ `#a場次報到` 收到通知
 - ❌ `#vip-報名警報` 不收到（因為不是 VIP）
 
-<!-- 📸 截圖：真實表單送出後，Discord #a場次報到 頻道收到通知 -->
+<img width="320" height="153" alt="image" src="https://github.com/user-attachments/assets/09758096-bfd7-4552-8815-18ae9a1b1932" />
 
 ---
 
