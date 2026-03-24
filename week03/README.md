@@ -66,15 +66,18 @@
 <img width="478" height="390" alt="image" src="https://github.com/user-attachments/assets/f9c2fc6d-3dd1-4c64-9c53-31b7ea8ad764" />
 
 5. **先在 AI Studio 內測試辨識能力：**
-   - 點擊左側「**Stream realtime**」
-   - 點擊「**+**」→「**Upload file**」上傳你的收據圖片
-   - 輸入以下 Prompt 測試：
+   - 點擊左側「**Playground**」
+   - 畫面中央會出現一個輸入框
+   - 點擊輸入框旁邊的「+」或「📎 迴紋針」圖示 → 上傳你的收據圖片
+   - 在文字輸入框輸入 Prompt
+   - 點擊送出，觀察 AI 回應
 ```
     你是一位專業會計助理。請辨識這張收據或匯款截圖，
     提取「匯款人姓名」和「總金額（純數字）」。
     請只回覆 JSON 格式，不要加任何其他文字：
     {"name": "姓名", "amount": 數字}
 ```
+<img width="967" height="182" alt="image" src="https://github.com/user-attachments/assets/8558f4f1-522f-424c-bb22-6c76892d9ad5" />
 
    - 確認 AI 在 2～3 秒內正確回應 JSON
 
