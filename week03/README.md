@@ -43,7 +43,8 @@
     https://drive.google.com/open?id=xxxxx
 ```
 
-<!-- 📸 截圖：試算表顯示收據圖片的 Drive 連結 -->
+<img width="1102" height="334" alt="image" src="https://github.com/user-attachments/assets/0212b5a2-e4cc-4f4f-ad65-6d2b267502fb" />
+
 
 ---
 
