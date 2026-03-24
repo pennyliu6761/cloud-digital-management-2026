@@ -229,7 +229,9 @@
     | Row Number | 節點一 Watch Rows 傳來的 `Row number` 變數 |
     | AI判讀結果（欄位） | Parse JSON 傳來的 `ParsedResults[].ParsedText` 變數 |
 
-<!-- 📸 截圖：Update a Row 欄位對應設定畫面 -->
+<img width="946" height="926" alt="image" src="https://github.com/user-attachments/assets/c7853542-96d3-498c-9f83-3f9c3c71b958" />
+<img width="1782" height="357" alt="image" src="https://github.com/user-attachments/assets/b6071f83-3e5a-4595-8a28-b0524d784084" />
+<img width="537" height="336" alt="image" src="https://github.com/user-attachments/assets/fd8a957d-9abd-4c83-9f69-35b97debf122" />
 
 ---
 
@@ -253,9 +255,13 @@
     **黃金原則：自動化負責苦力，人類負責最終決策。**
 ```
 
-<!-- 📸 截圖：Make 完整劇本畫布（所有六個節點） -->
-<!-- 📸 截圖：Discord 頻道收到覆核通知的畫面 -->
-<!-- 📸 截圖：試算表 AI判讀結果欄位自動填入的畫面 -->
+<img width="385" height="543" alt="image" src="https://github.com/user-attachments/assets/ce26d65c-a711-420e-9267-1fe36d825e66" />
+<img width="618" height="773" alt="image" src="https://github.com/user-attachments/assets/8193518b-92a1-4040-bfdd-80e00015d87c" />
+<img width="1766" height="334" alt="image" src="https://github.com/user-attachments/assets/ea1cbc5b-91aa-418c-9879-3cd464529307" />
+<img width="350" height="369" alt="image" src="https://github.com/user-attachments/assets/6995a186-bff6-48ec-a782-0af4adccc32a" />
+<img width="594" height="567" alt="image" src="https://github.com/user-attachments/assets/01eedabf-0822-4c73-a066-f7e62d666e8d" />
+<img width="1775" height="293" alt="image" src="https://github.com/user-attachments/assets/d323edf8-ae65-48c2-a95e-e94d63f546c6" />
+<img width="921" height="843" alt="image" src="https://github.com/user-attachments/assets/06b67185-4930-43ca-be10-efc4e553d8ba" />
 
 ---
 
