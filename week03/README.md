@@ -659,6 +659,436 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 
 ---
 
+## 💡 進階補充：用 Google Apps Script 取代 Make
+
+> [!NOTE]
+> 這是給對程式有興趣的同學的延伸閱讀。
+> 不需要完全看懂，理解「為什麼要這樣做」比「怎麼寫」更重要。
+
+---
+
+### 為什麼要取代 Make？
+
+| | Make 免費版 | Google Apps Script |
+|---|---|---|
+| 每月操作次數 | 1,000 次 | **無限制** |
+| 費用 | 超過要付費 | **完全免費** |
+| 執行速度 | 受方案限制 | 毫秒級 |
+| 與 Google 整合 | 需要授權設定 | **原生整合，不需要授權** |
+| 學習門檻 | 低（拖拉介面） | 中（需要寫簡單程式碼） |
+
+**結論：** 活動規模大、報名人數多時，Apps Script 比 Make 更穩定、更省錢。
+
+---
+
+### Google Apps Script 是什麼？
+
+Google Apps Script 是 Google 提供的**免費雲端程式環境**，語法類似 JavaScript，
+可以直接操控所有 Google 服務（試算表、表單、Gmail、Drive 等），不需要架設任何伺服器。
+```
+Make 的做法：
+Google 表單 → Make（第三方平台）→ Discord
+
+Apps Script 的做法：
+Google 表單 → Apps Script（住在 Google 裡面）→ Discord
+```
+
+---
+
+### 完整流程
+```
+表單送出
+    │
+    └→ GAS 自動執行
+          │
+          ├→ VIP 警報 → #vip-報名警報
+          ├→ 場次分流 → #a/#b/#c 場次報到
+          └→ OCR 辨識收據
+                │
+                ├→ 自動判斷檔案類型（PDF / PNG / JPG）
+                ├→ 回填試算表 AI判讀結果欄位
+                └→ 覆核通知 → #ai辨識
+```
+
+---
+
+### 📌 步驟一：在 Discord 為每個頻道建立 Webhook
+
+為以下每個頻道各建立一個 Webhook：
+
+| 頻道 | 用途 |
+|------|------|
+| `#vip-報名警報` | VIP 貴賓報名時通知 |
+| `#ai辨識` | OCR 收據辨識結果通知 |
+| `#a場次報到` | A 場次新報名通知 |
+| `#b場次報到` | B 場次新報名通知 |
+| `#c場次報到` | C 場次新報名通知 |
+
+**每個頻道的操作步驟：**
+
+1. 對頻道點擊「**⚙️ 編輯頻道**」
+2. 左側選單「**整合**」→「**Webhook**」
+3. 點擊「**新 Webhook**」
+
+> [!WARNING]
+> 必須點「新 Webhook」自己建立，才能複製 URL。
+> 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
+
+4. 名稱填入對應頻道名稱（例如：`a場次報到機器人`）
+5. 確認頻道正確
+6. 點擊剛建立的 Webhook 展開 →「**複製 Webhook 網址**」
+7. 貼到記事本備用，五個頻道都要做
+
+<!-- 📸 截圖：Discord Webhook 設定頁面，顯示複製網址按鈕 -->
+
+---
+
+### 📌 步驟二：開啟 Google Apps Script
+
+1. 開啟 `金門聚落文化營_報名總表` 試算表
+2. 上方選單「**擴充功能**」→「**Apps Script**」
+3. 清空編輯器原有內容
+
+<!-- 📸 截圖：Apps Script 編輯器畫面 -->
+
+---
+
+### 📌 步驟三：填入完整程式碼
+
+貼入以下完整程式碼：
+```javascript
+// ====== 設定區（只需要修改這裡）======
+const WEBHOOK_VIP     = "https://discord.com/api/webhooks/vip頻道URL";
+const WEBHOOK_AI_OCR  = "https://discord.com/api/webhooks/ai辨識頻道URL";
+const WEBHOOK_SCENE_A = "https://discord.com/api/webhooks/a場次頻道URL";
+const WEBHOOK_SCENE_B = "https://discord.com/api/webhooks/b場次頻道URL";
+const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/c場次頻道URL";
+const OCR_API_KEY     = "你的OCR.space API Key";
+const SPREADSHEET_ID  = "試算表網址中 /d/ 和 /edit 之間的那串字";
+const SHEET_NAME      = "表單回覆 1";
+const OCR_COLUMN      = 10;  // AI判讀結果欄位是第幾欄（A=1, B=2...）
+// =====================================
+
+// 發送訊息到 Discord 指定頻道
+function sendToDiscord(webhookUrl, message) {
+  UrlFetchApp.fetch(webhookUrl, {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({ content: message })
+  });
+}
+
+// 下載圖片並呼叫 OCR.space 辨識
+function runOcr(driveUrl) {
+
+  // 取出純 ID
+  const fileId = driveUrl.replace("https://drive.google.com/open?id=", "");
+  const downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
+
+  // 下載檔案
+  let fileResponse = UrlFetchApp.fetch(downloadUrl, {
+    followRedirects: true,
+    muteHttpExceptions: true
+  });
+
+  // 檢查是否跳出確認頁面（大檔案才會有）
+  let content = fileResponse.getContentText();
+  if (content.includes("confirm=")) {
+    const confirmMatch = content.match(/confirm=([^&"]+)/);
+    if (confirmMatch) {
+      const confirmUrl = downloadUrl + "&confirm=" + confirmMatch[1];
+      fileResponse = UrlFetchApp.fetch(confirmUrl, {
+        followRedirects: true,
+        muteHttpExceptions: true
+      });
+    }
+  }
+
+  // 自動判斷檔案類型
+  const contentType = fileResponse.getHeaders()["Content-Type"] || "";
+  let fileName;
+
+  if (contentType.includes("pdf")) {
+    fileName = "receipt.pdf";
+  } else if (contentType.includes("png")) {
+    fileName = "receipt.png";
+  } else if (contentType.includes("jpeg") || contentType.includes("jpg")) {
+    fileName = "receipt.jpg";
+  } else {
+    // 無法從 Content-Type 判斷時，從檔案內容開頭猜測
+    const firstBytes = fileResponse.getContentText().substring(0, 5);
+    if (firstBytes.startsWith("%PDF")) {
+      fileName = "receipt.pdf";
+    } else {
+      fileName = "receipt.jpg";  // 預設當成 jpg 處理
+    }
+  }
+
+  Logger.log("檔案類型：" + contentType + "，使用檔名：" + fileName);
+
+  // 轉成對應的 Blob
+  const fileBlob = fileResponse.getBlob().setName(fileName);
+
+  // 呼叫 OCR.space API
+  const ocrResponse = UrlFetchApp.fetch("https://api.ocr.space/parse/image", {
+    method: "post",
+    payload: {
+      apikey: OCR_API_KEY,
+      file: fileBlob,
+      language: "cht",
+      scale: true,
+      OCREngine: "2"
+    },
+    muteHttpExceptions: true
+  });
+
+  // 解析回傳結果
+  const result = JSON.parse(ocrResponse.getContentText());
+
+  if (result.IsErroredOnProcessing) {
+    return "OCR 辨識失敗：" + result.ErrorMessage;
+  }
+
+  return result.ParsedResults[0].ParsedText;
+}
+
+// 把 OCR 結果回填到試算表
+function updateSheet(rowNumber, ocrText) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  sheet.getRange(rowNumber, OCR_COLUMN).setValue(ocrText);
+}
+
+// 表單送出時自動執行（主函式）
+function onFormSubmit(e) {
+  const values      = e.values;
+  const rowNumber   = e.range.getRow();   // 取得這筆資料在試算表的列號
+  const timestamp   = values[0];          // Timestamp
+  const name        = values[1];          // 姓名
+  const email       = values[2];          // Email信箱
+  const scene       = values[3];          // 參加場次
+  const phone       = values[4];          // 聯絡電話
+  const isVip       = values[5];          // 是否為VIP貴賓
+  const receiptUrl  = values[6];          // 請上傳匯款收據截圖（圖片格式）
+
+  // ── 1. VIP 警報 ──────────────────────────
+  if (isVip === "是") {
+    sendToDiscord(WEBHOOK_VIP,
+      `🚨 **【VIP 報名警報】** 🚨\n\n` +
+      `有貴賓剛剛完成報名，請相關人員注意！\n\n` +
+      `▸ **姓名：** ${name}\n` +
+      `▸ **場次：** ${scene}\n` +
+      `▸ **信箱：** ${email}\n` +
+      `▸ **電話：** ${phone}\n` +
+      `▸ **時間：** ${timestamp}\n\n` +
+      `請於 30 分鐘內完成接待確認。`
+    );
+  }
+
+  // ── 2. 場次分流通知 ───────────────────────
+  const sceneMessage =
+    `📋 **【新報名通知】**\n\n` +
+    `▸ **姓名：** ${name}\n` +
+    `▸ **場次：** ${scene}\n` +
+    `▸ **時間：** ${timestamp}`;
+
+  if (scene === "A場：週六上午") {
+    sendToDiscord(WEBHOOK_SCENE_A, sceneMessage);
+  } else if (scene === "B場：週六下午") {
+    sendToDiscord(WEBHOOK_SCENE_B, sceneMessage);
+  } else if (scene === "C場：週日全天") {
+    sendToDiscord(WEBHOOK_SCENE_C, sceneMessage);
+  }
+
+  // ── 3. OCR 收據辨識 ───────────────────────
+  // 只有上傳了收據才執行
+  if (receiptUrl && receiptUrl.includes("drive.google.com")) {
+
+    // 呼叫 OCR 辨識
+    const ocrText = runOcr(receiptUrl);
+
+    // 回填試算表
+    updateSheet(rowNumber, ocrText);
+
+    // 推播 Discord 覆核通知
+    sendToDiscord(WEBHOOK_AI_OCR,
+      `💰 **【收據辨識通知】**\n\n` +
+      `系統已自動辨識新報名者的匯款收據，請人工覆核。\n\n` +
+      `▸ **報名者：** ${name}\n` +
+      `▸ **場次：** ${scene}\n\n` +
+      `**OCR 辨識結果：**\n` +
+      `${ocrText}\n\n` +
+      `⚠️ 辨識結果僅供參考，請開啟試算表確認金額是否正確。\n` +
+      `**黃金原則：自動化負責苦力，人類負責最終決策。**`
+    );
+  }
+}
+
+// ====== 測試函式 ======
+function testOnFormSubmit() {
+  const fakeEvent = {
+    range: { getRow: () => 2 },  // 假設資料在第 2 列
+    values: [
+      "2026/03/24 14:00:00",                                      // Timestamp
+      "王小明",                                                    // 姓名
+      "wang@test.com",                                             // Email信箱
+      "C場：週日全天",                                              // 參加場次
+      "0912345678",                                                // 聯絡電話
+      "是",                                                        // 是否為VIP貴賓
+      "https://drive.google.com/open?id=你的測試收據圖片ID"          // 收據圖片
+    ]
+  };
+  onFormSubmit(fakeEvent);
+}
+
+// ====== 除錯函式（測試下載是否正常）======
+function debugDownload() {
+  const driveUrl = "https://drive.google.com/open?id=你的測試收據圖片ID";
+  const fileId = driveUrl.replace("https://drive.google.com/open?id=", "");
+  const downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
+
+  const response = UrlFetchApp.fetch(downloadUrl, {
+    followRedirects: true,
+    muteHttpExceptions: true
+  });
+
+  Logger.log("Status code: " + response.getResponseCode());
+  Logger.log("Content type: " + response.getHeaders()["Content-Type"]);
+  Logger.log("Content length: " + response.getContent().length);
+  Logger.log("First 500 chars: " + response.getContentText().substring(0, 500));
+}
+```
+
+---
+
+### 設定區填寫說明
+
+| 變數 | 如何取得 |
+|------|---------|
+| `WEBHOOK_VIP` | Discord `#vip-報名警報` 頻道 → 整合 → Webhook → 複製網址 |
+| `WEBHOOK_AI_OCR` | Discord `#ai辨識` 頻道 → 整合 → Webhook → 複製網址 |
+| `WEBHOOK_SCENE_A/B/C` | 各場次頻道 → 同上 |
+| `OCR_API_KEY` | OCR.space 註冊信件裡的 API Key |
+| `SPREADSHEET_ID` | 試算表網址中 `/d/` 和 `/edit` 之間的那串字 |
+| `OCR_COLUMN` | 試算表裡 `AI判讀結果` 欄位是第幾欄（A=1, B=2...） |
+
+> [!NOTE]
+> **如何找試算表 ID：**
+> 開啟試算表，看網址列：
+> ```
+> https://docs.google.com/spreadsheets/d/【這裡就是ID】/edit#gid=874013079
+> ```
+> 注意：`gid=` 後面的數字是工作表編號，不是試算表 ID。
+
+---
+
+### 檔案類型自動判斷邏輯
+```
+下載檔案
+    │
+    ├→ Content-Type 包含 "pdf"          → receipt.pdf
+    ├→ Content-Type 包含 "png"          → receipt.png
+    ├→ Content-Type 包含 "jpeg"/"jpg"   → receipt.jpg
+    └→ 以上都不符合，看檔案開頭內容：
+          ├→ 開頭是 "%PDF"              → receipt.pdf
+          └→ 其他                       → receipt.jpg（預設）
+```
+
+> [!NOTE]
+> **為什麼需要判斷檔案類型？**
+> Google Drive 有時會把圖片轉成 PDF 格式儲存，
+> 尤其是透過表單上傳的檔案。
+> 如果不判斷直接當圖片處理，OCR.space 會回傳辨識失敗。
+
+---
+
+### 📌 步驟四：設定觸發條件
+
+> [!NOTE]
+> 這步驟完成後，GAS 就會在每次表單送出時**自動執行**，
+> 不需要你在場，也不需要手動點執行。
+
+1. 左側選單點擊「**⏰ 觸發條件**」（時鐘圖示）
+2. 右下角「**+ 新增觸發條件**」
+3. 設定如下：
+
+    | 設定項目 | 填入內容 |
+    |---------|---------|
+    | 執行的函式 | `onFormSubmit` |
+    | 執行部署 | `Head` |
+    | 活動來源 | `試算表` |
+    | 活動類型 | `提交表單時` |
+    | 失敗通知設定 | `每天通知` |
+
+4. 點擊「**儲存**」
+5. 跳出 Google 授權視窗 → 選擇你的帳號 → 點擊「**允許**」
+
+<!-- 📸 截圖：觸發條件設定完成畫面 -->
+
+---
+
+### 📌 步驟五：測試
+
+#### 先用測試函式驗證
+
+1. 把 `testOnFormSubmit` 裡的圖片 ID 換成真實的收據圖片 ID
+2. 函式選單切換到 `testOnFormSubmit` → 點「**▶ 執行**」
+3. 確認以下全部正確：
+
+    | 檢查項目 | 預期結果 |
+    |---------|---------|
+    | `#vip-報名警報` | ✅ 收到 VIP 警報 |
+    | `#c場次報到` | ✅ 收到場次通知 |
+    | `#ai辨識` | ✅ 收到 OCR 覆核通知 |
+    | 試算表 `AI判讀結果` 欄 | ✅ 自動填入辨識文字 |
+
+#### 若 OCR 失敗，先執行除錯函式
+
+1. 函式選單切換到 `debugDownload` → 點「**▶ 執行**」
+2. 點擊下方「**執行記錄**」
+3. 確認 `Content type` 和 `First 500 chars` 的內容
+
+    | Content type 顯示 | 代表意思 |
+    |------------------|---------|
+    | `application/pdf` | 檔案是 PDF，程式會自動處理 |
+    | `image/jpeg` | 檔案是 JPG 圖片 |
+    | `text/html` | 下載失敗，拿到 HTML 頁面，檢查 Drive 資料夾是否已設為公開 |
+
+#### 最終真實表單測試
+
+1. 開啟報名表單，填寫一筆真實資料並上傳收據
+2. 觀察 Discord 各頻道是否在 10 秒內收到通知
+3. 確認試算表 `AI判讀結果` 欄位自動填入
+
+<!-- 📸 截圖：GAS 程式碼完整畫面 -->
+<!-- 📸 截圖：執行記錄顯示檔案類型判斷結果 -->
+<!-- 📸 截圖：Discord 四個頻道同時收到通知的畫面 -->
+<!-- 📸 截圖：試算表 AI判讀結果欄位自動填入的畫面 -->
+
+---
+
+### 程式碼對照表：GAS vs Make
+
+| GAS 程式碼 | 對應的 Make 功能 |
+|-----------|----------------|
+| `const values = e.values` | Google Sheets Watch Rows 取得資料 |
+| `if (isVip === "是")` | Make Filter 過濾器 |
+| `sendToDiscord(WEBHOOK_VIP, ...)` | Discord Send Message 節點 |
+| `if / else if` 場次判斷 | Make Router 多路分流 |
+| `runOcr(receiptUrl)` | HTTP Download + OCR.space 節點 |
+| `updateSheet(rowNumber, ocrText)` | Google Sheets Update Row 節點 |
+| 觸發條件「提交表單時」 | Make Scenario 的 Form Trigger |
+
+> [!TIP]
+> **你會發現：**
+> Make 的每個「節點」，背後都對應著幾行程式碼。
+> 學會 Make 之後再來看程式碼，會發現其實沒有那麼難——
+> 因為你已經理解了背後的邏輯。
+>
+> **No-Code 工具是學習程式邏輯最好的跳板。**
+
+---
+
 ### Make vs Apps Script 選擇建議
 
 | 情境 | 建議工具 |
@@ -670,6 +1100,18 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 | 完全不想寫任何程式碼 | Make |
 | 想學一點程式基礎 | Apps Script |
 
+### 學習路徑建議
+
+> [!TIP]
+> ```
+> Make（理解自動化邏輯）
+>     ↓
+> GAS 基礎版（看懂程式碼和 Make 的對應關係）
+>     ↓
+> GAS 完整版（自己修改程式碼，加入新功能）
+>     ↓
+> 期末專題：自選情境，自己設計整套系統
+> ```
 
 ### 📚 課後自學資源
 
