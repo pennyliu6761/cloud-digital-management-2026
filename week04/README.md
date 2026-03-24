@@ -1,5 +1,3 @@
-<img width="684" height="307" alt="image" src="https://github.com/user-attachments/assets/eb9aa6b9-8376-410c-bdbd-81bd14c1f1c4" />## ⏰ Week 02：Google 表單魔法 — 從問卷到自動化文件工廠
-
 **雲端與數位內容管理 ｜ 國立金門大學 工業工程與管理學系**
 
 > **本週課程理念：** 大多數人用 Google 表單只用到 10% 的功能。
