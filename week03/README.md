@@ -980,6 +980,8 @@ function debugDownload() {
 > ```
 > 注意：`gid=` 後面的數字是工作表編號，不是試算表 ID。
 
+<img width="1108" height="83" alt="image" src="https://github.com/user-attachments/assets/46631b20-8c3e-48dd-ae3f-77d1f3f48041" />
+
 ---
 
 ### 檔案類型自動判斷邏輯
