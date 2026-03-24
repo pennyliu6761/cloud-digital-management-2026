@@ -674,11 +674,16 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 
 ---
 
+---
+
 ## 💡 進階補充 Part 2：GAS 整合 OCR.space 收據辨識
 
 > [!NOTE]
 > 本節在 Part 1 的基礎上，加入 OCR 收據辨識功能。
-> 完成後整個系統完全不需要 Make，一支程式搞定所有事。
+> OCR 觀念、Drive 資料夾公開設定、OCR.space API Key 申請方式
+> 請參考本章「第 3 小時：Make 串接 OCR 流程」的說明，這裡不再重複。
+>
+> 完成後整個系統**完全不需要 Make**，一支 GAS 程式搞定所有事。
 
 ---
 
@@ -690,7 +695,7 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 | 場次分流 | ✅ | ✅ |
 | OCR 收據辨識 | ❌ | ✅ |
 | 自動判斷 PDF / 圖片 | ❌ | ✅ |
-| 回填試算表 | ❌ | ✅ |
+| 回填試算表 AI判讀結果 | ❌ | ✅ |
 | Discord #ai辨識 覆核通知 | ❌ | ✅ |
 
 ---
@@ -712,68 +717,33 @@ const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
 
 ---
 
-### 📌 步驟一：申請 OCR.space 免費 API Key
+### 📌 步驟一：為 #ai辨識 頻道建立 Webhook
 
-**工具：** [OCR.space](https://ocr.space/ocrapi/freekey)（完全免費，不需要信用卡）
-
-1. 前往 [ocr.space/ocrapi/freekey](https://ocr.space/ocrapi/freekey)
-2. 填入你的 Email（其他欄位可以不填）
-3. 點擊送出
-4. 收第一封驗證信 → 點擊確認連結
-5. 收第二封信 → 裡面有你的 API Key，格式如下：
-```
-    K8xxxxxxxxxxxxxxxxx
-```
-
-<!-- 📸 截圖：OCR.space API Key 信件（Key 遮住後五碼） -->
-
----
-
-### 📌 步驟二：在 Discord 新增 #ai辨識 頻道的 Webhook
-
-在 Part 1 的基礎上，再為 `#ai辨識` 頻道建立一個 Webhook：
+在 Part 1 已建立的四個 Webhook 基礎上，再為 `#ai辨識` 頻道新增一個：
 
 1. 對 `#ai辨識` 頻道點擊「**⚙️ 編輯頻道**」
 2. 「**整合**」→「**Webhook**」→「**新 Webhook**」
 3. 名稱填：`OCR辨識機器人`
 4. 展開後「**複製 Webhook 網址**」備用
 
-<!-- 📸 截圖：#ai辨識 頻道 Webhook 設定完成 -->
-
----
-
-### 📌 步驟三：設定 Google Drive 資料夾公開權限
-
 > [!WARNING]
-> Google 表單上傳的圖片預設是私人的，GAS 無法直接下載。
-> 需要先把資料夾設為公開，這個步驟只需要做一次。
+> 必須點「**新 Webhook**」自己建立，才能複製 URL。
+> 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
 
-1. 開啟 [Google Drive](https://drive.google.com)
-2. 找到表單自動建立的上傳資料夾，名稱類似：
-```
-    金門聚落文化營 2026 — 線上報名表（檔案回覆）
-```
-3. 右鍵 →「**共用**」
-4. 「**一般存取權**」從「**受限**」改成「**知道連結的人**」
-5. 右側角色確認是「**檢視者**」
-6. 點擊「**完成**」
-
-<!-- 📸 截圖：Google Drive 資料夾共用設定畫面 -->
+<!-- 📸 截圖：#ai辨識 頻道 Webhook 設定完成，可複製網址 -->
 
 ---
 
-### 📌 步驟四：在試算表新增 AI判讀結果 欄位
+### 📌 步驟二：確認試算表有 AI判讀結果 欄位
 
-1. 開啟 `金門聚落文化營_報名總表` 試算表
-2. 在最後一欄新增欄位名稱：`AI判讀結果`
-3. 記下這個欄位是第幾欄（A=1, B=2...）
-4. 待會填入程式碼的 `OCR_COLUMN` 設定
+第 3 小時 Make 版已在試算表新增了 `AI判讀結果` 欄位，
+請確認該欄位是**第幾欄**（A=1, B=2...），填入程式碼的 `OCR_COLUMN` 設定。
 
-<!-- 📸 截圖：試算表新增 AI判讀結果 欄位 -->
+<!-- 📸 截圖：試算表 AI判讀結果 欄位，確認是第幾欄 -->
 
 ---
 
-### 📌 步驟五：用完整版程式碼取代 Part 1
+### 📌 步驟三：用完整版程式碼取代 Part 1
 
 開啟 Apps Script，**清空全部內容**，貼入以下完整版程式碼：
 ```javascript
@@ -798,7 +768,7 @@ function sendToDiscord(webhookUrl, message) {
   });
 }
 
-// 下載檔案並呼叫 OCR.space 辨識
+// 下載檔案並自動判斷類型，呼叫 OCR.space 辨識
 function runOcr(driveUrl) {
 
   // 取出純 ID
@@ -976,27 +946,26 @@ function debugDownload() {
 ```
 
 > [!WARNING]
-> **欄位順序確認：**
-> `values[6]` 對應的是收據上傳欄位。
-> 如果你的表單欄位順序不同，請對應調整數字。
-> 開啟試算表從左到右數欄位順序確認。
-
-> [!NOTE]
-> **如何找試算表 ID：**
-> ```
-> https://docs.google.com/spreadsheets/d/【這裡就是ID】/edit#gid=874013079
-> ```
-> 注意：`gid=` 後面的數字是工作表編號，不是試算表 ID。
+> **兩個地方需要特別確認：**
+>
+> 1. `values[6]` 對應的是收據上傳欄位，
+>    如果你的表單欄位順序不同，請對應調整數字。
+>
+> 2. `SPREADSHEET_ID` 是試算表網址中 `/d/` 和 `/edit` 之間的那串字：
+>    ```
+>    https://docs.google.com/spreadsheets/d/【這裡就是ID】/edit#gid=874013079
+>    ```
+>    注意：`gid=` 後面的數字是工作表編號，不是試算表 ID。
 
 <!-- 📸 截圖：Apps Script 完整版程式碼畫面 -->
 
 ---
 
-### 📌 步驟六：測試
+### 📌 步驟四：測試
 
 #### 先用測試函式驗證
 
-1. 把 `testOnFormSubmit` 裡的圖片 ID 換成真實的收據圖片 ID
+1. 把 `testOnFormSubmit` 裡的圖片 ID 換成試算表裡真實的收據圖片 ID
 2. 函式選單切換到 `testOnFormSubmit` → 點「**▶ 執行**」
 3. 確認以下全部正確：
 
@@ -1014,9 +983,9 @@ function debugDownload() {
 
 #### 若 OCR 失敗，先執行除錯函式
 
-1. 函式選單切換到 `debugDownload` → 點「**▶ 執行**」
-2. 點擊下方「**執行記錄**」
-3. 確認輸出內容：
+1. 把 `debugDownload` 裡的圖片 ID 換成真實 ID
+2. 函式選單切換到 `debugDownload` → 點「**▶ 執行**」
+3. 點擊下方「**執行記錄**」，確認輸出：
 
     | Content type 顯示 | 代表意思 |
     |------------------|---------|
@@ -1030,28 +999,30 @@ function debugDownload() {
 
 #### 觸發條件不需要重新設定
 
-Part 1 已經設定好「提交表單時執行 `onFormSubmit`」，
-完整版程式碼的主函式名稱相同，**不需要重新設定觸發條件**。
+Part 1 已設定好「提交表單時執行 `onFormSubmit`」，
+完整版主函式名稱相同，**不需要重新設定觸發條件**。
 
 ---
 
-### 檔案類型自動判斷邏輯說明
-```
-下載檔案
-    │
-    ├→ Content-Type 包含 "pdf"          → receipt.pdf
-    ├→ Content-Type 包含 "png"          → receipt.png
-    ├→ Content-Type 包含 "jpeg"/"jpg"   → receipt.jpg
-    └→ 以上都不符合，看檔案開頭：
-          ├→ 開頭是 "%PDF"              → receipt.pdf
-          └→ 其他                       → receipt.jpg（預設）
-```
+### 為什麼 GAS 能自動判斷 PDF 或圖片？
 
 > [!NOTE]
-> **為什麼需要自動判斷？**
+> Make 版本需要手動在 Field 2 填入 `receipt.jpg` 作為檔案名稱。
+> GAS 版本則會自動偵測，不需要人工判斷：
+>
+> ```
+> 下載檔案
+>     │
+>     ├→ Content-Type 包含 "pdf"          → receipt.pdf
+>     ├→ Content-Type 包含 "png"          → receipt.png
+>     ├→ Content-Type 包含 "jpeg"/"jpg"   → receipt.jpg
+>     └→ 以上都不符合，看檔案開頭：
+>           ├→ 開頭是 "%PDF"              → receipt.pdf
+>           └→ 其他                       → receipt.jpg（預設）
+> ```
+>
 > Google Drive 有時會把圖片轉成 PDF 格式儲存，
-> 尤其是透過表單上傳的檔案。
-> 如果不判斷直接當圖片處理，OCR.space 會回傳辨識失敗。
+> 自動判斷讓系統不管使用者上傳什麼格式都能正確處理。
 
 ---
 
@@ -1083,11 +1054,11 @@ Part 1 已經設定好「提交表單時執行 `onFormSubmit`」，
 > [!TIP]
 > **學習路徑建議：**
 > ```
-> Make（理解自動化邏輯）
+> Make（理解自動化邏輯，No-Code 入門）
 >     ↓
 > GAS Part 1（VIP 警報 + 場次分流，看懂程式碼和 Make 的對應關係）
 >     ↓
-> GAS Part 2（加入 OCR，學會呼叫外部 API）
+> GAS Part 2（加入 OCR，學會呼叫外部 API 與處理檔案）
 >     ↓
 > 期末專題：自選情境，自己設計整套系統
 > ```
