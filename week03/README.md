@@ -1,1096 +1,716 @@
-## ⏰ 3 ：AI 賦能雲端 — OCR 視覺辨識 × 收據自動核銷
+# ⚙️ Week 03：Make 進階 — 打造有商業邏輯的自動化架構
 
-> 🎯 **本小時目標：** 把 AI 的「眼睛」接入工作流。
-> 讓 OCR.space 自動讀取上傳的收據圖片文字，回填試算表，
-> 並推播人工覆核通知到 Discord——徹底取代人工核對的苦差事。
+**雲端與數位內容管理 ｜ 國立金門大學 工業工程與管理學系**
 
----
-
-### 💡 觀念講解：OCR 是什麼？
-
-**OCR（Optical Character Recognition，光學字元辨識）** 是把圖片裡的文字轉成電腦可以讀取的文字的技術。
-
-| 輸入 | 輸出 |
-|------|------|
-| 收據圖片 | `柯文哲競選總部 110元` |
-| 匯款截圖 | `王大明 轉帳 1500元` |
-| 發票照片 | `統一編號 48776781` |
-
-> [!NOTE]
-> **OCR 辨識品質取決於圖片清晰度：**
-> - ✅ 電子轉帳截圖、網銀畫面 → 辨識率接近 100%
-> - ⚠️ 手寫字、印章、格線干擾 → 辨識率較低
+> **本週課程理念：** Week 01 我們學會了「讓資料從 A 流到 B」。
+> 但真實的商業流程很少是一條直線——資料需要根據條件分流、需要逐筆處理、需要在出錯時通知人。
 >
-> 這就是為什麼系統設計要加入「人工覆核」環節。
-> **自動化負責苦力，人類負責最終決策。**
+> **今天我們要讓自動化流程真正「有智慧」。**
 
 ---
 
-### 💡 本小時完整流程
-```
-[ Google 表單上傳收據圖片 ]
-          │
-          ▼
-[ Google Sheets Watch Rows ]  ← Make 監控新報名
-          │
-          ▼
-[ HTTP - Download a File ]    ← 下載收據圖片
-          │
-          ▼
-[ HTTP - OCR.space ]          ← OCR 辨識圖片文字
-          │
-          ▼
-[ JSON - Parse JSON ]         ← 解析辨識結果
-          │
-          ▼
-[ Google Sheets Update Row ]  ← 回填 AI 判讀結果
-          │
-          ▼
-[ Discord 通知 ]              ← 推播人工覆核警報
-```
+## 🎯 本週學習目標
+
+學完本週，你將能夠：
+- ✅ 用 **Router** 讓一個觸發器分岔成多條支線，根據條件執行不同動作
+- ✅ 用 **Iterator** 把陣列資料拆開，讓 Make 逐筆處理每一項
+- ✅ 設計**錯誤處理機制**，系統出錯時自動推播通知，不讓流程默默失敗
+- ✅ 理解 **Webhook** 的雙向應用：不只接收，還能主動觸發外部系統
+- ✅ 把多個劇本組合成一套**完整的自動化工作流系統**
 
 ---
 
-### 📌 任務 3-1：在表單加入收據上傳功能
+## 🏢 本週實作情境：【工管系廠商實習處理中心 2.0】
 
-1. 開啟 `金門聚落文化營 2026 — 線上報名表`
-2. 新增題目，題型選「**檔案上傳**」，設定如下：
-
-    | 設定項目 | 填入內容 |
-    |---------|---------|
-    | 題目 | `請上傳匯款收據截圖（圖片格式）` |
-    | 允許的檔案類型 | 勾選「**圖片**」 |
-    | 最大檔案數量 | 1 |
-    | 最大檔案大小 | 10 MB |
-
-<img width="840" height="693" alt="image" src="https://github.com/user-attachments/assets/186ed59e-1da4-43ab-aa83-43a5aca3d50d" />
-
-3. 建立測試資料：找一張收據或轉帳截圖，填寫表單並上傳，送出
-
-<img width="1102" height="597" alt="image" src="https://github.com/user-attachments/assets/ee2278b5-c673-4a70-a5ef-49f743883e61" />
-
-4. 確認試算表出現一個 Google Drive 連結，格式如下：
-```
-    https://drive.google.com/open?id=xxxxx
-```
-
-<img width="400" height="379" alt="image" src="https://github.com/user-attachments/assets/89da4031-76e4-4c42-966d-fdbb0d92cfae" />
+> 💼 **情境升級：** Week 02 你建立了實習申請表和 AutoCrat 文件工廠。
+> 但系辦反映：
+>
+> 1. 不同場次的申請要通知不同的工作人員頻道（**需要分流**）
+> 2. 一份申請可能有多個附件，需要逐一處理（**需要迭代**）
+> 3. 昨天 OCR 流程靜靜失敗了三小時，沒有人知道（**需要錯誤處理**）
+>
+> **今天的任務：把 Week 01 的單線流程升級成企業級的健壯系統。**
 
 ---
 
-### 📌 任務 3-2：設定 Google Drive 資料夾公開權限
+## ⏰ 第 1 小時：Router — 讓資料根據條件分流
 
-> [!WARNING]
-> Google 表單上傳的圖片預設是私人的，Make 無法直接存取。
-> 需要先把資料夾設為公開，這個步驟只需要做一次。
-
-1. 開啟 [Google Drive](https://drive.google.com)
-2. 找到表單自動建立的上傳資料夾，名稱類似：
-```
-    金門聚落文化營 2026 — 線上報名表（檔案回覆）
-```
-3. 右鍵 →「**共用**」
-4. 「**一般存取權**」從「**受限**」改成「**知道連結的人**」
-5. 右側角色確認是「**檢視者**」
-6. 點擊「**完成**」
-
-<img width="493" height="429" alt="image" src="https://github.com/user-attachments/assets/d22d13ee-8a8d-47c3-bb08-5915f035810c" />
+> 🎯 **本小時目標：** 理解並實作 Make 的 Router 模組，
+> 讓同一個觸發器根據不同條件，執行完全不同的動作。
 
 ---
 
-### 📌 任務 3-3：申請 OCR.space 免費 API Key
+### 💡 觀念講解：Router 是什麼？
 
-**工具：** [OCR.space](https://ocr.space/ocrapi/freekey)（完全免費，不需要信用卡）
-
-1. 前往 [ocr.space/ocrapi/freekey](https://ocr.space/ocrapi/freekey)
-2. 填入你的 **Email**（其他欄位可以不填）
-3. 點擊送出
-4. 去信箱收第一封驗證信 → 點擊確認連結
-5. 再收第二封信 → 裡面有你的 **API Key**，格式如下：
+**Router（路由器）** 是 Make 最重要的流程控制模組。
 ```
-    K8xxxxxxxxxxxxxxxxx
+沒有 Router 的世界：
+[ 觸發器 ] → [ 動作 A ]
+
+有 Router 的世界：
+                    ┌→ 條件1成立 → [ 動作 A ]
+[ 觸發器 ] → Router ┤
+                    ├→ 條件2成立 → [ 動作 B ]
+                    │
+                    └→ 其他條件  → [ 動作 C ]
 ```
 
-<img width="799" height="430" alt="image" src="https://github.com/user-attachments/assets/1c782b1f-c6be-4968-8630-2a367c0918cf" />
+**生活比喻：** Router 就像交通號誌。
+同樣是「一輛車」（資料），根據車牌顏色（條件）分流到不同車道（支線）。
+
+| 沒有 Router | 有 Router |
+|-----------|---------|
+| 所有資料執行相同動作 | 根據條件執行不同動作 |
+| 邏輯只能靠 Filter 過濾 | 可以同時處理多種情況 |
+| A 不符合就什麼都不做 | A 不符合可以走 B 路線 |
 
 ---
 
-### 📌 任務 3-4：Make 串接完整 OCR 流程
+### 📌 任務 1-1：實習申請場次分流系統
 
-> [!NOTE]
-> 建議新建一個劇本專門處理「收據辨識核銷流程」，
-> 與第 2 小時的「VIP 警報流程」分開管理。
+**情境：** 實習申請表有三種申請類型（國內／海外／自行開發），
+每種類型要通知不同的 Discord 頻道：
 
----
-
-#### 節點一：Google Sheets Watch Rows
-
-設定同第 2 小時，**不需要過濾器**，所有新報名都要處理。
-
-| 設定項目 | 填入內容 |
+| 實習類型 | 通知頻道 |
 |---------|---------|
-| Spreadsheet | `金門聚落文化營_報名總表` |
-| Sheet | `表單回覆 1` |
-| Limit | `2` |
+| 國內企業實習 | `#國內實習-審核` |
+| 海外實習 | `#海外實習-審核` |
+| 自行開發 | `#自開發-審核` |
 
-<img width="649" height="857" alt="image" src="https://github.com/user-attachments/assets/fa759969-e22f-4a01-b66a-525c7aa21ea1" />
-<img width="366" height="556" alt="image" src="https://github.com/user-attachments/assets/b827412b-ca53-46c6-9347-e40ce8b4e252" />
+#### 步驟一：在 Discord 建立三個頻道並取得 Webhook URL
+
+依照 Week 01 的方式，為以下三個頻道各建立一個 Webhook：
+- `#國內實習-審核`
+- `#海外實習-審核`
+- `#自開發-審核`
+
+把三個 Webhook URL 分別貼到記事本備用。
+
+<!-- 📸 截圖：Discord 三個頻道建立完成 -->
 
 ---
 
-#### 節點二：HTTP - Download a File（下載收據圖片）
+#### 步驟二：建立新的 Make 劇本
 
-1. 新增「**HTTP**」→「**Get a File**」
-2. 設定如下：
+1. 前往 Make.com，建立新劇本
+2. 新增觸發器：**Google Sheets → Watch New Rows**
+3. 連結到 Week 02 的實習申請試算表
+
+<!-- 📸 截圖：Google Sheets 觸發器設定 -->
+
+---
+
+#### 步驟三：新增 Router 模組
+
+1. 點擊 Google Sheets 節點右側的「**+**」
+2. 搜尋「**Flow Control**」→ 選擇「**Router**」
+3. Router 會自動展開成兩條支線，你可以繼續點擊「**+**」新增第三條
+
+<!-- 📸 截圖：Router 模組展開後的三條支線畫布 -->
+
+---
+
+#### 步驟四：為每條支線設定過濾條件
+
+**支線 1 — 國內企業實習：**
+
+1. 點擊支線 1 上的**扳手圖示（Filter）**
+2. 設定：
 
     | 設定項目 | 填入內容 |
     |---------|---------|
-    | URL | 見下方 |
-    | Method | `GET` |
+    | Label | `國內企業實習` |
+    | Condition | `實習類型` → `Equal to (text)` → `國內企業實習` |
 
-3. **URL 欄位**輸入以下公式（把 Google Drive 連結轉換成可直接下載的格式）：
-```
-    https://drive.google.com/uc?export=download&id={{substring(1.`請上傳匯款收據截圖（圖片格式）`; 33)}}
-```
+**支線 2 — 海外實習：**
 
-    > [!NOTE]
-    > **公式說明：**
-    > - `https://drive.google.com/open?id=` 這段文字共 33 個字元
-    > - `substring(...; 33)` 從第 33 個字元開始取到結尾，只留下純 ID
-    > - 組裝成 `uc?export=download&id=純ID` 格式，才能直接下載圖片
+條件：`實習類型` Equal to `海外實習`
 
-<img width="1051" height="400" alt="image" src="https://github.com/user-attachments/assets/728b54eb-c9cd-4aa8-bb5f-e208358a5609" />
+**支線 3 — 自行開發：**
+
+條件：`實習類型` Equal to `自行開發實習單位`
+
+<!-- 📸 截圖：其中一條支線的 Filter 設定畫面 -->
 
 ---
 
-#### 節點三：HTTP - Make a Request（OCR.space 辨識）
+#### 步驟五：為每條支線加入 Discord 通知
 
-1. 新增「**HTTP**」→「**Make a Request**」
-2. 設定如下：
+每條支線各自新增一個 **Discord → Send a Message by Webhook Bot**，
+填入對應頻道的 Webhook URL 和通知訊息：
 
-    | 設定項目 | 填入內容 |
-    |---------|---------|
-    | URL | `https://api.ocr.space/parse/image` |
-    | Method | `POST` |
-    | Authentication type | `No authentication` |
-    | Body content type | `multipart/form-data` |
+**支線 1 訊息範例：**
+```
+📋 **【國內企業實習申請】**
 
-<img width="658" height="694" alt="image" src="https://github.com/user-attachments/assets/d680696f-437c-42c3-9392-416d05e4496e" />
+▸ **申請人：** {{姓名}}
+▸ **學號：** {{學號}}
+▸ **實習企業：** {{實習企業名稱}}
+▸ **申請時間：** {{Timestamp}}
 
-3. **Body content** 新增三個 Field：
+請於 3 個工作天內完成審核。
+```
 
-    **Field 1：API Key**
+**支線 2 / 3** 訊息格式相同，只換開頭標題和對應欄位。
 
-    | Name | Field type | Value |
-    |------|-----------|-------|
-    | `apikey` | Text | 你的 OCR.space API Key |
-
-    **Field 2：圖片檔案**
-
-    | Name | Field type | File | File name |
-    |------|-----------|------|-----------|
-    | `file` | File | HTTP Download a File 的 `Data` 變數 | `receipt.jpg` |
-
-    **Field 3：語言設定**
-
-    | Name | Field type | Value |
-    |------|-----------|-------|
-    | `language` | Text | `cht` |
-
-4. **Parse response** → 選 `Yes`
-
-<img width="395" height="713" alt="image" src="https://github.com/user-attachments/assets/66d626e8-4967-4d1c-bdb4-90cb7e46f68b" />
-<img width="382" height="594" alt="image" src="https://github.com/user-attachments/assets/1c0c1d30-4baf-4d89-a915-1798ccfb88c9" />
+<!-- 📸 截圖：Make 完整劇本畫布（Google Sheets → Router → 三條支線） -->
 
 ---
 
-#### 節點四：JSON - Parse JSON（解析辨識結果）
+#### 步驟六：壓力測試
 
-1. 新增「**JSON**」→「**Parse JSON**」
-2. **JSON string** 欄位：帶入 OCR.space 節點傳來的 `Data` 變數
+填寫三筆不同類型的實習申請，確認三個 Discord 頻道各自收到對應的通知。
 
-<img width="688" height="354" alt="image" src="https://github.com/user-attachments/assets/7e0a9314-42a1-45db-ad0e-e1b5e6f9d272" />
+<!-- 📸 截圖：三個 Discord 頻道各自收到通知的畫面 -->
 
----
-
-#### 節點五：Google Sheets Update Row（回填辨識結果）
-
-1. 先回到 Google 試算表，手動新增一欄：`AI判讀結果`
-
-<img width="554" height="147" alt="image" src="https://github.com/user-attachments/assets/e7312dea-cb2e-44aa-b0a1-d997e8526a66" />
-
-2. 新增「**Google Sheets**」→「**Update a Row**」
-3. 設定如下：
-
-    | 設定項目 | 填入內容 |
-    |---------|---------|
-    | Spreadsheet | `金門聚落文化營_報名總表` |
-    | Sheet | `表單回覆 1` |
-    | Row Number | 節點一 Watch Rows 傳來的 `Row number` 變數 |
-    | AI判讀結果（欄位） | Parse JSON 傳來的 `ParsedResults[].ParsedText` 變數 |
-
-<img width="946" height="926" alt="image" src="https://github.com/user-attachments/assets/c7853542-96d3-498c-9f83-3f9c3c71b958" />
-<img width="1782" height="357" alt="image" src="https://github.com/user-attachments/assets/b6071f83-3e5a-4595-8a28-b0524d784084" />
-<img width="537" height="336" alt="image" src="https://github.com/user-attachments/assets/fd8a957d-9abd-4c83-9f69-35b97debf122" />
-
----
-
-#### 節點六：Discord 人工覆核通知
-
-1. 新增「**Discord**」→「**Send a Message by Webhook Bot**」
-2. Webhook URL 填入你的 Discord Webhook URL
-3. **Message 欄位**輸入：
-```
-    💰 **【收據辨識通知】**
-
-    系統已自動辨識新報名者的匯款收據，請人工覆核。
-
-    ▸ **報名者：** {{姓名}}
-    ▸ **場次：** {{參加場次}}
-
-    **OCR 辨識結果：**
-    {{ParsedText}}
-
-    ⚠️ 辨識結果僅供參考，請開啟試算表確認金額是否正確。
-    **黃金原則：自動化負責苦力，人類負責最終決策。**
-```
-
-<img width="385" height="543" alt="image" src="https://github.com/user-attachments/assets/ce26d65c-a711-420e-9267-1fe36d825e66" />
-<img width="618" height="773" alt="image" src="https://github.com/user-attachments/assets/8193518b-92a1-4040-bfdd-80e00015d87c" />
-<img width="1766" height="334" alt="image" src="https://github.com/user-attachments/assets/ea1cbc5b-91aa-418c-9879-3cd464529307" />
-<img width="350" height="369" alt="image" src="https://github.com/user-attachments/assets/6995a186-bff6-48ec-a782-0af4adccc32a" />
-<img width="594" height="567" alt="image" src="https://github.com/user-attachments/assets/01eedabf-0822-4c73-a066-f7e62d666e8d" />
-<img width="1775" height="293" alt="image" src="https://github.com/user-attachments/assets/d323edf8-ae65-48c2-a95e-e94d63f546c6" />
-<img width="921" height="843" alt="image" src="https://github.com/user-attachments/assets/06b67185-4930-43ca-be10-efc4e553d8ba" />
-
----
-
-### 🎯 終極壓力測試！
-
-1. 點擊 Make 左下角「**Run once**」
-2. 填寫一筆新表單，上傳一張**電子轉帳截圖**（建議用網銀截圖，辨識率較高）
-3. 觀察資料依序流經每個節點：
-```
-    📋 Google Sheets 抓到新報名資料
-         ↓
-    📥 HTTP 下載收據圖片
-         ↓
-    🔍 OCR.space 辨識圖片文字（約 1～3 秒）
-         ↓
-    📊 JSON 解析完成
-         ↓
-    📝 試算表 AI判讀結果 欄位自動填入
-         ↓
-    🔔 Discord 收到人工覆核通知
-```
-
-> [!WARNING]
-> **🚨 OCR 辨識品質說明**
+> [!NOTE]
+> **Router vs Filter 的差異**
 >
-> OCR 辨識品質受圖片品質影響很大：
->
-> | 圖片類型 | 預期辨識品質 |
-> |---------|------------|
-> | 網路銀行轉帳截圖 | ⭐⭐⭐⭐⭐ 幾乎完美 |
-> | 電子發票截圖 | ⭐⭐⭐⭐ 很好 |
-> | 清晰的印刷收據 | ⭐⭐⭐ 尚可 |
-> | 手寫、有印章的收據 | ⭐⭐ 較差 |
->
-> **這就是 Discord 人工覆核通知存在的原因。**
-> 系統自動辨識節省了人工打字的時間，
-> 但最終確認金額的責任還是在人。
+> | | Filter | Router |
+> |---|---|---|
+> | 不符合條件時 | 整個流程停止 | 走其他支線 |
+> | 適合情境 | 只有一種條件需要處理 | 多種條件各有對應動作 |
+> | 支線數量 | 只有一條（通過或不通過）| 可以有無限條支線 |
 
 > [!TIP]
-> **🏆 3  Checkpoint 完成！**
+> **🏆 第 1 小時 Checkpoint 完成！**
 >
-> 你串接完成的系統：
-> - ✅ 表單上傳圖片 → OCR 自動辨識文字
-> - ✅ 辨識結果自動回填試算表
-> - ✅ Discord 推播人工覆核通知
-> - ✅ 人工保有最終確認權
->
-> 這套系統如果對外發包，報價至少 **NT$ 80,000**。
-> 你用零成本、零程式碼完成了。
+> - ✅ 同一個觸發器根據實習類型分流到三個不同 Discord 頻道
+> - ✅ 理解 Router 和 Filter 的本質差異
+> - ✅ 完成企業級的多條件分流自動化架構
 
 ---
 
-### 🎯 3 學生練習題
+### 🎯 第 1 小時學生練習題
 
 > [!NOTE]
-> **⏱️ 練習時間：20 分鐘｜個人 + 分組討論**
+> **⏱️ 練習時間：15 分鐘｜個人作業**
 
 ---
 
-#### 【練習 3-A】Prompt 改版：換一張更清楚的收據（個人，基礎）
+#### 【練習 1-A】Router 四路分流（基礎）
 
-找一張**網路銀行轉帳截圖**或**超商繳費截圖**重新上傳，
-觀察 OCR 辨識結果是否比手寫收據更準確。
+把你的 Router 擴充成四條支線，加入第四條：
 
-截圖比較兩張收據的辨識結果，說明圖片品質對 OCR 的影響。
+- 條件：`審核狀態` Equal to `退件`
+- 動作：發送 Discord 通知到 `#退件通知` 頻道
+- 訊息內容：包含申請人姓名、學號、退件時間，以及「請於 5 個工作天內重新申請」的說明
+
+完成後填寫一筆審核狀態為「退件」的測試資料，截圖 Discord 收到通知的畫面。
 
 ---
 
-#### 【練習 3-B】擴充 Discord 通知內容（個人，進階）
+#### 【練習 1-B】Router + Gmail 雙通知（進階）
 
-目前 Discord 通知只顯示 OCR 全文，請修改 Message，
-在通知最後加入一個試算表的直接連結，讓覆核人員點一下就能開啟：
+在支線 1（國內企業實習）的 Discord 通知之後，**再串接一個 Gmail 通知**，
+自動寄信給申請學生確認收件：
+
+- 收件人：`{{Email信箱}}`
+- 主旨：`【工管系實習處理中心】您的實習申請已收件 — {{姓名}}`
+- 內文：包含申請人姓名、企業名稱、預計審核完成時間（3 個工作天後）
+
+> [!TIP]
+> 在同一條支線上，Router 後面可以串接多個動作模組，
+> 依序執行：Discord 通知 → Gmail 寄信，兩個動作都會完成。
+
+截圖 Make 支線 1 的完整流程（Discord + Gmail 兩個節點）。
+
+---
+
+#### 【練習 1-C】觀念問答（思考題）
+
+請用自己的話（100 字以內）回答，貼到課堂共用文件：
+
+> ❓ 如果你的 Router 有三條支線，但某一筆資料三個條件都不符合，
+> Make 會怎麼處理這筆資料？這會不會造成問題？
+> 你有什麼方法可以確保每一筆資料都被某條支線處理到？
+
+---
+
+## ⏰ 第 2 小時：Iterator — 讓 Make 逐筆處理陣列資料
+
+> 🎯 **本小時目標：** 理解陣列（Array）的概念，
+> 並用 Iterator 把陣列拆開，讓 Make 對每一項資料執行相同的動作。
+
+---
+
+### 💡 觀念講解：陣列是什麼？Iterator 解決什麼問題？
+
+**陣列（Array）** 是一個裝著多個值的容器。
 ```
-📊 點此開啟試算表覆核：
-https://drive.google.com/file/d/1EuxDcNWbN96EUv9fPMI6rcVZLIvvVM6m/view
+一般變數：  姓名 = "王大明"           （一個值）
+陣列變數：  附件清單 = ["合約.pdf",    （多個值）
+                       "成績單.pdf",
+                       "推薦信.pdf"]
 ```
 
-<img width="535" height="718" alt="image" src="https://github.com/user-attachments/assets/3a54070f-5583-41c0-a7f6-970ef7c86302" />
+**問題：** Make 的大部分模組一次只能處理一個值。
+如果你有一個包含三個附件的陣列，直接帶入模組，它不知道要處理哪一個。
+
+**Iterator 的解法：**
+```
+陣列 ["合約.pdf", "成績單.pdf", "推薦信.pdf"]
+         ↓ Iterator 拆開
+    第1次執行 → "合約.pdf"    → 後續模組處理
+    第2次執行 → "成績單.pdf"  → 後續模組處理
+    第3次執行 → "推薦信.pdf"  → 後續模組處理
+```
+
+> Iterator 就像是把一疊卡片一張一張翻開，
+> 讓後面的人每次只看到一張，處理完再換下一張。
 
 ---
 
-#### 【練習 3-C】期末延伸構想（分組，2～3 人，挑戰）
+### 📌 任務 2-1：建立含多個附件的測試情境
 
-你們小組要提出「第 14 週期末專題」的初步構想：
+**情境：** 系辦要把試算表中每位學生的「需繳交文件清單」，
+逐一發送 Discord 提醒給對應的審核人員。
 
-1. **選定一個真實情境**（工工系的痛點、金門大學的行政流程、或金門縣的在地問題）
-2. **說明使用哪些工具**（至少用到這三週學過的 3 種以上工具）
-3. **畫出資料流程圖**（從使用者第一個動作到系統最後輸出，可手繪拍照）
+試算表新增一欄「**需繳交文件**」，填入以下格式（用逗號分隔）：
 
-**下週課程最後 10 分鐘，每組 2 分鐘說明構想，老師給初步回饋。**
+| 姓名 | 需繳交文件 |
+|------|---------|
+| 王大明 | 實習同意書,成績單,在學證明 |
+| 李美麗 | 實習同意書,護照影本,簽證影本,保險證明 |
+| 陳志偉 | 實習同意書,統一編號證明,接洽說明書 |
+
+<!-- 📸 截圖：試算表填入需繳交文件欄位 -->
+
+---
+
+### 📌 任務 2-2：用 Iterator 逐一處理文件清單
+
+#### 步驟一：建立新劇本
+
+1. 新增觸發器：**Google Sheets → Watch New Rows**
+2. 連結實習申請試算表
+
+---
+
+#### 步驟二：新增 Text Parser 把字串轉成陣列
+
+「需繳交文件」欄位的值是一段文字（`"實習同意書,成績單,在學證明"`），
+不是陣列，需要先轉換。
+
+1. 新增「**Text Parser**」→「**Split text into segments**」
+2. 設定：
+
+    | 設定項目 | 填入內容 |
+    |---------|---------|
+    | Text | `{{需繳交文件}}` 變數 |
+    | Separator | `,`（逗號）|
+
+<!-- 📸 截圖：Text Parser 設定畫面 -->
+
+---
+
+#### 步驟三：新增 Iterator
+
+1. 新增「**Flow Control**」→「**Iterator**」
+2. **Array** 欄位：選擇 Text Parser 輸出的陣列變數
+
+<!-- 📸 截圖：Iterator 設定畫面 -->
+
+---
+
+#### 步驟四：Iterator 後面串接 Discord 通知
+
+1. 新增 **Discord → Send a Message by Webhook Bot**
+2. Message 欄位：
+```
+    📎 **【文件繳交提醒】**
+
+    申請人 **{{姓名}}** 需繳交以下文件：
+    ▸ {{value}}
+
+    請確認上述文件已備妥後，至系辦完成繳交。
+```
+
+    > `{{value}}` 是 Iterator 每次傳出的單一項目值，
+    > 也就是每次只顯示一個文件名稱。
+
+<!-- 📸 截圖：Make 完整劇本（Sheets → Text Parser → Iterator → Discord） -->
+
+---
+
+#### 步驟五：執行測試
+
+點擊「**Run once**」，觀察 Discord 頻道收到幾則訊息：
+
+- 王大明：應收到 **3 則**（3 個文件）
+- 李美麗：應收到 **4 則**（4 個文件）
+- 陳志偉：應收到 **3 則**（3 個文件）
+
+<!-- 📸 截圖：Discord 頻道收到多則逐項文件通知 -->
 
 > [!NOTE]
-> **範例構想（僅供參考）**
+> **Iterator 執行邏輯**
 >
-> **情境：** 工工系系辦用紙本管理「借用設備申請」，常搞不清楚設備被誰借走了。
+> Iterator 每次只輸出陣列的一個元素，然後讓後面的模組執行一次。
+> 陣列有幾個元素，後面的模組就執行幾次。
 >
-> **工具：** Google 表單 → 試算表 → AppSheet（手機確認歸還）→ Make（逾期未還推播 Discord）→ Looker Studio（設備使用率儀表板）
+> 這就是為什麼 3 個文件會產生 3 則 Discord 訊息。
+
+> [!TIP]
+> **🏆 第 2 小時 Checkpoint 完成！**
 >
-> **資料流：** 學生填表 → 試算表新增紀錄 → AppSheet 顯示待確認清單 → 管理員確認借出 → Make 監控逾期 → 自動推播 Discord 通知
+> - ✅ 理解陣列和一般變數的差異
+> - ✅ 用 Text Parser 把逗號分隔的字串轉成陣列
+> - ✅ 用 Iterator 拆解陣列，讓後續模組逐筆執行
+> - ✅ 完成「一筆資料觸發多次動作」的進階流程
 
 ---
 
-## 🏆 第一週總結
+### 🎯 第 2 小時學生練習題
 
-### 📊 你今天打造的完整系統
+> [!NOTE]
+> **⏱️ 練習時間：15 分鐘｜個人作業**
+
+---
+
+#### 【練習 2-A】Iterator 計數（基礎）
+
+在 Iterator 之後、Discord 通知之前，新增一個
+**Tools → Set Variable** 模組，把「目前處理到第幾個文件」記錄下來：
+
+- Variable name：`document_index`
+- Variable value：`{{i}}` （Iterator 的內建計數變數）
+
+修改 Discord 訊息格式，加入序號：
 ```
-[ Google 表單 ] ──→ [ 試算表 (SSOT) ] ──→ [ AppSheet App ]
-       │                    │                      │
-       │ AutoCrat           │ Make 監控             │ 手機報到
-       ↓                    ↓                      ↓
-[ PDF 憑證 ]        [ VIP 警報流程 ]        [ Looker Studio ]
-  寄到信箱           Discord 推播             即時儀表板
-                           │
-                  [ HTTP 下載圖片 ]
-                           ↓
-                  [ OCR.space 辨識 ]
-                           ↓
-              [ 自動回填 + Discord 覆核通知 ]
+📎 文件 {{i}}/{{total}} — {{value}}
 ```
 
-### 💰 價值換算
+> [!TIP]
+> Iterator 提供兩個內建變數：
+> - `{{i}}` = 目前是第幾次迭代（從 1 開始）
+> - `{{total}}` = 陣列總共有幾個元素
 
-| 功能項目 | 外包報價估算 | 你的成本 |
-|---------|-----------|---------|
-| 自動化報名 + PDF 憑證系統 | NT$ 30,000 | 免費 |
-| 手機報到 App + 儀表板 | NT$ 70,000 | 免費 |
-| Discord 自動警報系統 | NT$ 15,000 | 免費 |
-| OCR 收據辨識核銷 | NT$ 50,000 | 免費 |
-| **合計** | **NT$ 165,000+** | **NT$ 0** |
+---
+
+#### 【練習 2-B】Router + Iterator 組合（進階）
+
+設計一個「智慧文件提醒系統」，結合本週所學：
+
+1. **Router** 根據實習類型分流：
+    - 國內實習 → 文件清單 A（實習同意書、成績單、在學證明）
+    - 海外實習 → 文件清單 B（實習同意書、護照影本、簽證影本、保險證明）
+    - 自行開發 → 文件清單 C（實習同意書、統一編號證明、接洽說明書）
+
+2. **每條支線** 用 Iterator 逐一發送文件提醒到 Discord
+
+截圖 Make 完整劇本畫布（Router + 三條支線各自有 Iterator 的完整架構）。
+
+---
+
+#### 【練習 2-C】觀念問答（思考題）
+
+請用自己的話回答，貼到課堂共用文件：
+
+> ❓ 如果試算表裡某位學生的「需繳交文件」欄位是空白的，
+> Iterator 會怎麼處理？整個劇本會出錯嗎？
+> 你要在哪個步驟加入什麼防護措施？
+
+---
+
+## ⏰ 第 3 小時：錯誤處理 — 讓系統出錯時主動告訴你
+
+> 🎯 **本小時目標：** 設計「永不靜悄悄失敗」的自動化系統。
+> 當任何步驟出錯時，系統會立即推播通知，並記錄錯誤資訊到試算表。
+
+---
+
+### 💡 觀念講解：為什麼錯誤處理很重要？
+
+**沒有錯誤處理的系統：**
+```
+Week 01 的 OCR 流程發生錯誤
+    ↓
+Make 靜悄悄停止執行
+    ↓
+沒有人知道
+    ↓
+3 小時後才發現有 50 筆收據沒有被處理
+```
+
+**有錯誤處理的系統：**
+```
+Week 01 的 OCR 流程發生錯誤
+    ↓
+錯誤處理路線立即啟動
+    ↓
+Discord 推播：「OCR 流程發生錯誤！錯誤訊息：...」
+    ↓
+管理員 30 秒內收到通知，立即處理
+```
+
+> [!NOTE]
+> **Make 的錯誤處理機制**
+>
+> Make 提供三種錯誤處理路線（Error Handler Route）：
+>
+> | 類型 | 說明 | 適用情境 |
+> |------|------|---------|
+> | **Ignore** | 忽略錯誤，繼續執行下一筆 | 錯誤不影響後續流程 |
+> | **Resume** | 忽略錯誤，繼續執行同一筆的後續模組 | 某步驟非必要 |
+> | **Break** | 停止執行，並將失敗的資料存入佇列等待重試 | 資料必須成功處理 |
+
+---
+
+### 📌 任務 3-1：為 OCR 流程加入錯誤處理
+
+**情境：** 把 Week 01 建立的 OCR 收據辨識劇本升級，加入完整的錯誤處理。
+
+#### 步驟一：開啟 Week 01 的 OCR 劇本
+
+1. 進入 Make → 找到 Week 01 建立的 OCR 劇本
+2. 點擊「**Edit**」進入編輯模式
+
+---
+
+#### 步驟二：為 OCR.space 節點加入錯誤處理路線
+
+1. 對 **HTTP Make a Request（OCR.space）** 節點按右鍵
+2. 選擇「**Add error handler**」
+3. 選擇「**Break**」（停止執行並記錄失敗資料，等待重試）
+
+Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
+
+<!-- 📸 截圖：OCR 節點下方出現錯誤處理路線 -->
+
+---
+
+#### 步驟三：在錯誤路線加入 Discord 緊急通知
+
+1. 點擊錯誤路線末端的「**+**」
+2. 新增 **Discord → Send a Message by Webhook Bot**
+3. 連結到 `#系統錯誤警報` 頻道（先建立這個頻道並取得 Webhook URL）
+4. Message 填入：
+```
+    🚨 **【系統錯誤警報】OCR 流程發生錯誤**
+
+    ▸ **時間：** {{now}}
+    ▸ **申請人：** {{姓名}}
+    ▸ **錯誤訊息：** {{error.message}}
+    ▸ **錯誤模組：** {{error.name}}
+
+    ⚠️ 請立即登入 Make 查看錯誤詳情，並手動處理這筆資料。
+```
+
+<!-- 📸 截圖：錯誤路線的 Discord 通知設定 -->
+
+---
+
+#### 步驟四：在錯誤路線加入試算表記錄
+
+除了推播通知，同時把錯誤記錄到試算表，方便事後追蹤：
+
+1. 在 Discord 通知之後，再新增 **Google Sheets → Add a Row**
+2. 連結到一個新的試算表「**系統錯誤記錄**」
+3. 欄位對應：
+
+    | 試算表欄位 | Make 變數 |
+    |---------|---------|
+    | 錯誤時間 | `{{now}}` |
+    | 申請人 | `{{姓名}}` |
+    | 錯誤訊息 | `{{error.message}}` |
+    | 錯誤模組 | `{{error.name}}` |
+    | 處理狀態 | `待處理`（固定文字） |
+
+<!-- 📸 截圖：Google Sheets Add a Row 設定畫面 -->
+
+---
+
+### 📌 任務 3-2：製造錯誤來測試！
+
+> [!NOTE]
+> 這是少數「故意讓系統出錯」的時刻——為了驗證錯誤處理真的有效。
+
+**方法：** 暫時把 OCR.space 的 API Key 改成一個錯誤的值（例如 `WRONG_KEY`），
+然後執行劇本。
+
+1. 進入 HTTP Make a Request（OCR.space）節點
+2. 把 `apikey` 欄位的值改成 `WRONG_KEY`
+3. 點擊「**Run once**」
+4. 確認：
+    - Make 劇本沒有靜悄悄失敗
+    - Discord `#系統錯誤警報` 頻道收到錯誤通知
+    - 試算表「系統錯誤記錄」新增了一筆錯誤記錄
+
+<!-- 📸 截圖：Discord 收到錯誤警報通知 -->
+<!-- 📸 截圖：試算表錯誤記錄新增一筆 -->
+
+5. 測試完成後，把 API Key 改回正確的值
+
+---
+
+### 📌 任務 3-3：Webhook 雙向應用
+
+**情境：** 系辦審核完實習申請後，
+希望直接在試算表把「審核狀態」改為「已核准」，
+系統就自動觸發 AutoCrat 產出同意書並寄出。
+
+> [!NOTE]
+> **這和 Week 01 的差異：**
+> Week 01 是「表單送出時」觸發 Make（被動等待）。
+> 這個任務是「試算表欄位被修改時」觸發（主動偵測變化）。
+
+#### 步驟一：建立新劇本，觸發器改為 Watch Changes
+
+1. 新建劇本
+2. 觸發器選 **Google Sheets → Watch Changes**（不是 Watch New Rows）
+3. 設定：
+
+    | 設定項目 | 填入內容 |
+    |---------|---------|
+    | Spreadsheet | 實習申請試算表 |
+    | Sheet | 表單回覆 1 |
+    | Trigger On | `Updated rows`（監控列的修改）|
+
+<!-- 📸 截圖：Watch Changes 觸發器設定 -->
+
+---
+
+#### 步驟二：加入 Filter 只處理「已核准」的變更
+
+1. 在觸發器後加入 Filter
+2. 條件：`審核狀態` Equal to `已核准`
+
+這樣只有當審核狀態被改成「已核准」時，後續流程才會執行。
+
+---
+
+#### 步驟三：串接 Discord 通知（模擬 AutoCrat 觸發）
+
+實際串接 AutoCrat 需要額外設定，這裡先用 Discord 通知來驗證邏輯：
+
+1. 新增 Discord 通知，訊息：
+```
+    ✅ **【實習申請已核准】**
+
+    ▸ **申請人：** {{姓名}}
+    ▸ **實習企業：** {{企業名稱}}
+    ▸ **核准時間：** {{now}}
+
+    系統正在產出實習同意書，請稍候...
+```
+
+2. 回到試算表，把某一筆申請的「審核狀態」欄位改為「已核准」
+3. 確認 Discord 收到通知
+
+<!-- 📸 截圖：試算表修改審核狀態後，Discord 收到通知 -->
+
+> [!TIP]
+> **🏆 第 3 小時 Checkpoint 完成！**
+>
+> - ✅ 為 OCR 流程加入錯誤處理，系統出錯時主動推播通知
+> - ✅ 錯誤資訊自動記錄到試算表，方便事後追蹤
+> - ✅ 理解 Webhook 的雙向應用：監控試算表修改事件
+
+---
+
+### 🎯 第 3 小時學生練習題
+
+> [!NOTE]
+> **⏱️ 練習時間：20 分鐘｜個人 + 分組**
+
+---
+
+#### 【練習 3-A】全流程錯誤處理（個人，基礎）
+
+為你的「實習申請場次分流系統」（Week 03 第 1 小時）也加入錯誤處理：
+
+- 對 Router 的每條支線末端的 Discord 節點加入錯誤處理
+- 錯誤時推播到 `#系統錯誤警報` 頻道
+- 訊息包含：錯誤時間、申請人姓名、錯誤訊息
+
+截圖加入錯誤處理後的完整劇本畫布。
+
+---
+
+#### 【練習 3-B】整合挑戰（分組，2～3 人）
+
+情境：你的小組要設計一套「完整的實習處理自動化系統 2.0」，整合本週所有技術：
+
+系統需求：
+1. **Router** 根據實習類型分流到三個 Discord 頻道
+2. **Iterator** 逐一發送每位申請者的必繳文件提醒
+3. **錯誤處理** 確保任何步驟出錯都會推播通知並記錄
+4. **Watch Changes** 監控審核狀態，核准後自動發送確認通知給申請學生（Gmail）
+
+繳交：Make 劇本的截圖（展示完整架構）+ 說明文件（解釋每個模組的設計邏輯）
+展示：下週上課前，每組 3 分鐘上台說明系統設計。
+
+---
+
+#### 【練習 3-C】Make vs GAS 比較（思考題）
+
+本週學的三個 Make 進階功能（Router、Iterator、錯誤處理），都可以用 GAS 程式碼實現。
+
+請用表格比較這兩種方式，貼到課堂共用文件：
+
+| 功能 | Make 做法 | GAS 做法 | 你認為哪個更適合？為什麼？ |
+|------|---------|---------|----------------------|
+| Router 分流 | Router 模組 + Filter | `if / else if` | |
+| Iterator 迭代 | Iterator 模組 | `for` 迴圈 | |
+| 錯誤處理 | Error Handler Route | `try / catch` | |
+
+---
+
+## 🏆 本週總結
+
+### 📊 本週技能地圖
+```
+【Make 基礎（Week 01）】
+單線流程：觸發 → 條件 → 動作
+
+        ↓ 本週升級
+
+【Make 進階（Week 03）】
+
+Router：一個觸發器 → 多條支線 → 各自執行不同動作
+    └─ 實習類型分流 → 三個 Discord 頻道
+
+Iterator：陣列資料 → 拆開 → 逐筆執行
+    └─ 文件清單 → 逐一發送提醒
+
+錯誤處理：任何節點出錯 → 錯誤路線啟動 → 推播 + 記錄
+    └─ OCR 失敗 → Discord 緊急通知 → 試算表記錄
+
+Watch Changes：試算表修改 → 觸發後續動作
+    └─ 審核狀態改為已核准 → 自動發送確認通知
+```
 
 ### 🤔 課後思考問題
 
-1. **系統瓶頸：** 如果同時有 500 人在同一分鐘送出表單，這套系統哪個環節最可能出問題？如何改善？
+1. **Router 的盲點：** 如果你的 Router 有三條支線，但某一筆資料三個條件都不符合，這筆資料會消失不見。你在設計 Router 時，應該加入什麼「保底支線」來確保每一筆資料都有對應的處理方式？
 
-2. **OCR 的限制：** 今天的實作中，手寫收據辨識品質很差。除了換清楚的圖片，你還能想到哪些方式改善這個問題？
+2. **Iterator 的效能問題：** 如果一個陣列有 100 個元素，Iterator 就會讓後面的模組執行 100 次。如果每次執行都要呼叫一個外部 API（例如傳送 Email），可能會很慢甚至觸發 API 的速率限制。你有什麼方法可以改善？
 
-3. **延伸應用：** 除了收據核銷，「圖片上傳 → OCR 辨識 → 自動入庫」這個流程還可以用在哪些場景？
+3. **錯誤處理的設計哲學：** 「Ignore（忽略）」和「Break（停止並重試）」兩種錯誤處理策略，分別適合什麼情境？如果是財務相關的資料處理流程（例如發薪水），你會選擇哪種？為什麼？
 
-
-## 💡 進階補充：用 Google Apps Script 取代 Make
-
-> [!NOTE]
-> 這是給對程式有興趣的同學的延伸閱讀。
-> 不需要完全看懂，理解「為什麼要這樣做」比「怎麼寫」更重要。
-
----
-
-### 為什麼要取代 Make？
-
-| | Make 免費版 | Google Apps Script |
-|---|---|---|
-| 每月操作次數 | 1,000 次 | **無限制** |
-| 費用 | 超過要付費 | **完全免費** |
-| 執行速度 | 受方案限制 | 毫秒級 |
-| 與 Google 整合 | 需要授權設定 | **原生整合，不需要授權** |
-| 學習門檻 | 低（拖拉介面） | 中（需要寫簡單程式碼） |
-
-**結論：** 活動規模大、報名人數多時，Apps Script 比 Make 更穩定、更省錢。
-
----
-
-### Google Apps Script 是什麼？
-
-Google Apps Script 是 Google 提供的**免費雲端程式環境**，語法類似 JavaScript，
-可以直接操控所有 Google 服務（試算表、表單、Gmail、Drive 等），不需要架設任何伺服器。
-```
-Make 的做法：
-Google 表單 → Make（第三方平台）→ Discord
-
-Apps Script 的做法：
-Google 表單 → Apps Script（住在 Google 裡面）→ Discord
-```
-
----
-
-### 📌 任務：建立 Discord 多頻道自動分流通知系統
-
-#### 步驟一：在 Discord 為每個頻道建立 Webhook
-
-為以下每個頻道各建立一個 Webhook：
-
-| 頻道 | 用途 |
-|------|------|
-| `#vip-報名警報` | VIP 貴賓報名時通知 |
-| `#a場次報到` | A 場次新報名通知 |
-| `#b場次報到` | B 場次新報名通知 |
-| `#c場次報到` | C 場次新報名通知 |
-
-**每個頻道的操作步驟：**
-
-1. 對頻道點擊「**⚙️ 編輯頻道**」
-2. 左側選單「**整合**」→「**Webhook**」
-3. 點擊「**新 Webhook**」
-
-   > [!WARNING]
-   > 必須點「新 Webhook」自己建立，才能複製 URL。
-   > 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
-
-4. 名稱填入對應頻道名稱（例如：`a場次報到機器人`）
-5. 確認頻道是正確的
-6. 點擊剛建立的 Webhook 展開 →「**複製 Webhook 網址**」
-7. 貼到記事本備用
-
-<img width="296" height="203" alt="image" src="https://github.com/user-attachments/assets/e5dbfc74-fd4a-414c-834b-22984ae24caa" />
-<img width="1032" height="639" alt="image" src="https://github.com/user-attachments/assets/7fd2ca2f-4f4b-4346-9f2d-72d20eaf8362" />
-
-
----
-
-#### 步驟二：開啟 Google Apps Script
-
-1. 開啟 `金門聚落文化營_報名總表` 試算表
-2. 上方選單「**擴充功能**」→「**Apps Script**」
-3. 會開啟一個程式碼編輯器
-
-<img width="743" height="294" alt="image" src="https://github.com/user-attachments/assets/47de2f3a-affc-4646-91c4-2c6920e2e052" />
-
----
-
-#### 步驟三：貼入程式碼
-
-清空編輯器原有內容，貼入以下完整程式碼：
-```javascript
-// ====== 設定區（只需要修改這裡）======
-const WEBHOOK_VIP     = "https://discord.com/api/webhooks/vip頻道URL";
-const WEBHOOK_SCENE_A = "https://discord.com/api/webhooks/a場次頻道URL";
-const WEBHOOK_SCENE_B = "https://discord.com/api/webhooks/b場次頻道URL";
-const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/c場次頻道URL";
-// =====================================
-
-// 發送訊息到指定頻道的共用函式
-function sendToDiscord(webhookUrl, message) {
-  UrlFetchApp.fetch(webhookUrl, {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify({ content: message })
-  });
-}
-
-// 表單送出時自動執行
-function onFormSubmit(e) {
-  const values    = e.values;
-  const timestamp = values[0];  // Timestamp
-  const name      = values[1];  // 姓名
-  const email     = values[2];  // Email信箱
-  const scene     = values[3];  // 參加場次
-  const phone     = values[4];  // 聯絡電話
-  const isVip     = values[5];  // 是否為VIP貴賓
-
-  // VIP 警報 → #vip-報名警報 頻道
-  if (isVip === "是") {
-    sendToDiscord(WEBHOOK_VIP,
-      `🚨 **【VIP 報名警報】** 🚨\n\n` +
-      `有貴賓剛剛完成報名，請相關人員注意！\n\n` +
-      `▸ **姓名：** ${name}\n` +
-      `▸ **場次：** ${scene}\n` +
-      `▸ **信箱：** ${email}\n` +
-      `▸ **電話：** ${phone}\n` +
-      `▸ **時間：** ${timestamp}\n\n` +
-      `請於 30 分鐘內完成接待確認。`
-    );
-  }
-
-  // 場次分流 → 各場次頻道
-  const sceneMessage =
-    `📋 **【新報名通知】**\n\n` +
-    `▸ **姓名：** ${name}\n` +
-    `▸ **場次：** ${scene}\n` +
-    `▸ **時間：** ${timestamp}`;
-
-  if (scene === "A場：週六上午") {
-    sendToDiscord(WEBHOOK_SCENE_A, sceneMessage);
-  } else if (scene === "B場：週六下午") {
-    sendToDiscord(WEBHOOK_SCENE_B, sceneMessage);
-  } else if (scene === "C場：週日全天") {
-    sendToDiscord(WEBHOOK_SCENE_C, sceneMessage);
-  }
-}
-
-// ====== 測試函式（測試完成後可以保留備用）======
-function testOnFormSubmit() {
-  const fakeEvent = {
-    values: [
-      "2026/03/24 14:00:00",  // Timestamp
-      "王小明",                // 姓名
-      "wang@test.com",         // Email信箱
-      "C場：週日全天",          // 參加場次
-      "0912345678",            // 聯絡電話
-      "是"                     // 是否為VIP貴賓
-    ]
-  };
-  onFormSubmit(fakeEvent);
-}
-```
-
-> [!WARNING]
-> **欄位順序很重要！**
-> `values[0]`、`values[1]`... 對應的是試算表從左到右的欄位順序。
-> 如果你的表單欄位順序不同，請對應調整數字。
-> 可以開啟試算表，從左到右數欄位順序來確認。
-
----
-
-#### 步驟四：填入真實的 Webhook URL
-
-把設定區的四個 `"...URL"` 換成你在步驟一複製的真實網址：
-```javascript
-const WEBHOOK_VIP     = "https://discord.com/api/webhooks/123456/abcdef...";
-const WEBHOOK_SCENE_A = "https://discord.com/api/webhooks/234567/bcdefg...";
-const WEBHOOK_SCENE_B = "https://discord.com/api/webhooks/345678/cdefgh...";
-const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/456789/defghi...";
-```
-
-點擊上方「**💾 儲存**」（或 `Ctrl+S`）
-
-<img width="1019" height="827" alt="image" src="https://github.com/user-attachments/assets/05daf7af-39d5-4ddf-87c3-af1662c7df13" />
-<img width="802" height="420" alt="image" src="https://github.com/user-attachments/assets/11fcef63-9188-471f-ad07-5fd28928d9fe" />
-
----
-
-#### 步驟五：先用測試函式驗證
-
-在編輯器上方的函式選單，**切換成 `testOnFormSubmit`**，點擊「**▶ 執行**」。
-
-**預期結果：**
-- ✅ `#vip-報名警報` 收到 VIP 警報（因為測試資料 isVip = 是）
-- ✅ `#c場次報到` 收到新報名通知（因為測試資料場次 = C場）
-- ❌ `#a場次報到` 和 `#b場次報到` 不應該收到
-
-<img width="311" height="235" alt="image" src="https://github.com/user-attachments/assets/dd1b5449-cddd-441b-9802-dda8fb012a97" />
-<img width="318" height="156" alt="image" src="https://github.com/user-attachments/assets/0ed022bb-cd85-49f1-96d3-0d9867a221cb" />
-
----
-
-#### 步驟六：設定觸發條件（讓系統自動執行）
-
-> [!NOTE]
-> 這步驟完成後，GAS 就會在每次表單送出時**自動執行**，
-> 不需要你在場，也不需要手動點執行。
-
-1. 左側選單點擊「**⏰ 觸發條件**」（時鐘圖示）
-2. 右下角「**+ 新增觸發條件**」
-3. 設定如下：
-
-    | 設定項目 | 填入內容 |
-    |---------|---------|
-    | 執行的函式 | `onFormSubmit` |
-    | 執行部署 | `Head` |
-    | 活動來源 | `試算表` |
-    | 活動類型 | `提交表單時` |
-    | 失敗通知設定 | `每天通知` |
-
-4. 點擊「**儲存**」
-5. 跳出 Google 授權視窗 → 選擇你的帳號 → 點擊「**允許**」
-
-<img width="279" height="319" alt="image" src="https://github.com/user-attachments/assets/acafd05a-5d5f-4920-9126-ac13bc0565c1" />
-<img width="1311" height="811" alt="image" src="https://github.com/user-attachments/assets/669ea511-7d0f-4761-8cd1-8859df98ed61" />
-
----
-
-#### 步驟七：真實表單最終測試
-
-1. 開啟報名表單連結
-2. 填寫一筆真實資料：
-    - 姓名：任意
-    - 場次：「**A場：週六上午**」
-    - VIP：「**否**」
-3. 送出表單
-
-**預期結果：**
-- ✅ `#a場次報到` 收到通知
-- ❌ `#vip-報名警報` 不收到（因為不是 VIP）
-
-<img width="320" height="153" alt="image" src="https://github.com/user-attachments/assets/09758096-bfd7-4552-8815-18ae9a1b1932" />
-
----
-
-### 程式碼邏輯對照表
-
-| GAS 程式碼 | 對應的 Make 功能 |
-|-----------|---------------|
-| `const values = e.values` | Google Sheets Watch Rows 取得資料 |
-| `if (isVip === "是")` | Make Filter 過濾器 |
-| `sendToDiscord(WEBHOOK_VIP, ...)` | Discord Send Message 節點 |
-| `if / else if` 場次判斷 | Make Router 多路分流 |
-| 觸發條件「提交表單時」 | Make Scenario 的 Form Trigger |
-
-> [!TIP]
-> **你會發現：**
-> Make 的每個「節點」，背後都對應著幾行程式碼。
-> 學會 Make 之後再來看程式碼，會發現其實沒有那麼難——
-> 因為你已經理解了背後的邏輯。
->
-> **No-Code 工具是學習程式邏輯最好的跳板。**
-
----
-
-### 為什麼要取代 Make？
-
-| | Make 免費版 | Google Apps Script |
-|---|---|---|
-| 每月操作次數 | 1,000 次 | **無限制** |
-| 費用 | 超過要付費 | **完全免費** |
-| 執行速度 | 受方案限制 | 毫秒級 |
-| 與 Google 整合 | 需要授權設定 | **原生整合，不需要授權** |
-| 學習門檻 | 低（拖拉介面） | 中（需要寫簡單程式碼） |
-
-**結論：** 活動規模大、報名人數多時，Apps Script 比 Make 更穩定、更省錢。
-
-
----
-
----
-
-## 💡 進階補充 Part 2：GAS 整合 OCR.space 收據辨識
-
-> [!NOTE]
-> 本節在 Part 1 的基礎上，加入 OCR 收據辨識功能。
-> OCR 觀念、Drive 資料夾公開設定、OCR.space API Key 申請方式
-> 請參考本章「第 3 小時：Make 串接 OCR 流程」的說明，這裡不再重複。
->
-> 完成後整個系統**完全不需要 Make**，一支 GAS 程式搞定所有事。
-
----
-
-### 與 Part 1 的差異
-
-| | Part 1（基礎版） | Part 2（完整版） |
-|---|---|---|
-| VIP 警報 | ✅ | ✅ |
-| 場次分流 | ✅ | ✅ |
-| OCR 收據辨識 | ❌ | ✅ |
-| 自動判斷 PDF / 圖片 | ❌ | ✅ |
-| 回填試算表 AI判讀結果 | ❌ | ✅ |
-| Discord #ai辨識 覆核通知 | ❌ | ✅ |
-
----
-
-### 完整流程
-```
-表單送出
-    │
-    └→ GAS 自動執行
-          │
-          ├→ VIP 警報 → #vip-報名警報
-          ├→ 場次分流 → #a/#b/#c 場次報到
-          └→ OCR 辨識收據
-                │
-                ├→ 自動判斷檔案類型（PDF / PNG / JPG）
-                ├→ 回填試算表 AI判讀結果欄位
-                └→ 覆核通知 → #ai辨識
-```
-
----
-
-### 📌 步驟一：為 #ai辨識 頻道建立 Webhook
-
-在 Part 1 已建立的四個 Webhook 基礎上，再為 `#ai辨識` 頻道新增一個：
-
-1. 對 `#ai辨識` 頻道點擊「**⚙️ 編輯頻道**」
-2. 「**整合**」→「**Webhook**」→「**新 Webhook**」
-3. 名稱填：`OCR辨識機器人`
-4. 展開後「**複製 Webhook 網址**」備用
-
-> [!WARNING]
-> 必須點「**新 Webhook**」自己建立，才能複製 URL。
-> 由 Make 或其他平台建立的 Webhook，Discord 不允許複製網址。
-
-<!-- 📸 截圖：#ai辨識 頻道 Webhook 設定完成，可複製網址 -->
-
----
-
-### 📌 步驟二：確認試算表有 AI判讀結果 欄位
-
-第 3 小時 Make 版已在試算表新增了 `AI判讀結果` 欄位，
-請確認該欄位是**第幾欄**（A=1, B=2...），填入程式碼的 `OCR_COLUMN` 設定。
-
-<!-- 📸 截圖：試算表 AI判讀結果 欄位，確認是第幾欄 -->
-
----
-
-### 📌 步驟三：用完整版程式碼取代 Part 1
-
-開啟 Apps Script，**清空全部內容**，貼入以下完整版程式碼：
-```javascript
-// ====== 設定區（只需要修改這裡）======
-const WEBHOOK_VIP     = "https://discord.com/api/webhooks/vip頻道URL";
-const WEBHOOK_AI_OCR  = "https://discord.com/api/webhooks/ai辨識頻道URL";
-const WEBHOOK_SCENE_A = "https://discord.com/api/webhooks/a場次頻道URL";
-const WEBHOOK_SCENE_B = "https://discord.com/api/webhooks/b場次頻道URL";
-const WEBHOOK_SCENE_C = "https://discord.com/api/webhooks/c場次頻道URL";
-const OCR_API_KEY     = "你的OCR.space API Key";
-const SPREADSHEET_ID  = "試算表網址中 /d/ 和 /edit 之間的那串字";
-const SHEET_NAME      = "表單回覆 1";
-const OCR_COLUMN      = 10;  // AI判讀結果欄位是第幾欄（A=1, B=2...）
-// =====================================
-
-// 發送訊息到 Discord 指定頻道
-function sendToDiscord(webhookUrl, message) {
-  UrlFetchApp.fetch(webhookUrl, {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify({ content: message })
-  });
-}
-
-// 下載檔案並自動判斷類型，呼叫 OCR.space 辨識
-function runOcr(driveUrl) {
-
-  // 取出純 ID
-  const fileId = driveUrl.replace("https://drive.google.com/open?id=", "");
-  const downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
-
-  // 下載檔案
-  let fileResponse = UrlFetchApp.fetch(downloadUrl, {
-    followRedirects: true,
-    muteHttpExceptions: true
-  });
-
-  // 檢查是否跳出確認頁面（大檔案才會有）
-  let content = fileResponse.getContentText();
-  if (content.includes("confirm=")) {
-    const confirmMatch = content.match(/confirm=([^&"]+)/);
-    if (confirmMatch) {
-      const confirmUrl = downloadUrl + "&confirm=" + confirmMatch[1];
-      fileResponse = UrlFetchApp.fetch(confirmUrl, {
-        followRedirects: true,
-        muteHttpExceptions: true
-      });
-    }
-  }
-
-  // 自動判斷檔案類型
-  const contentType = fileResponse.getHeaders()["Content-Type"] || "";
-  let fileName;
-
-  if (contentType.includes("pdf")) {
-    fileName = "receipt.pdf";
-  } else if (contentType.includes("png")) {
-    fileName = "receipt.png";
-  } else if (contentType.includes("jpeg") || contentType.includes("jpg")) {
-    fileName = "receipt.jpg";
-  } else {
-    // 無法從 Content-Type 判斷時，從檔案內容開頭猜測
-    const firstBytes = fileResponse.getContentText().substring(0, 5);
-    if (firstBytes.startsWith("%PDF")) {
-      fileName = "receipt.pdf";
-    } else {
-      fileName = "receipt.jpg";  // 預設當成 jpg 處理
-    }
-  }
-
-  Logger.log("檔案類型：" + contentType + "，使用檔名：" + fileName);
-
-  // 轉成對應的 Blob
-  const fileBlob = fileResponse.getBlob().setName(fileName);
-
-  // 呼叫 OCR.space API
-  const ocrResponse = UrlFetchApp.fetch("https://api.ocr.space/parse/image", {
-    method: "post",
-    payload: {
-      apikey: OCR_API_KEY,
-      file: fileBlob,
-      language: "cht",
-      scale: true,
-      OCREngine: "2"
-    },
-    muteHttpExceptions: true
-  });
-
-  // 解析回傳結果
-  const result = JSON.parse(ocrResponse.getContentText());
-
-  if (result.IsErroredOnProcessing) {
-    return "OCR 辨識失敗：" + result.ErrorMessage;
-  }
-
-  return result.ParsedResults[0].ParsedText;
-}
-
-// 把 OCR 結果回填到試算表
-function updateSheet(rowNumber, ocrText) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  sheet.getRange(rowNumber, OCR_COLUMN).setValue(ocrText);
-}
-
-// 表單送出時自動執行（主函式）
-function onFormSubmit(e) {
-  const values      = e.values;
-  const rowNumber   = e.range.getRow();   // 取得這筆資料在試算表的列號
-  const timestamp   = values[0];          // Timestamp
-  const name        = values[1];          // 姓名
-  const email       = values[2];          // Email信箱
-  const scene       = values[3];          // 參加場次
-  const phone       = values[4];          // 聯絡電話
-  const isVip       = values[5];          // 是否為VIP貴賓
-  const receiptUrl  = values[6];          // 請上傳匯款收據截圖
-
-  // ── 1. VIP 警報 ──────────────────────────
-  if (isVip === "是") {
-    sendToDiscord(WEBHOOK_VIP,
-      `🚨 **【VIP 報名警報】** 🚨\n\n` +
-      `有貴賓剛剛完成報名，請相關人員注意！\n\n` +
-      `▸ **姓名：** ${name}\n` +
-      `▸ **場次：** ${scene}\n` +
-      `▸ **信箱：** ${email}\n` +
-      `▸ **電話：** ${phone}\n` +
-      `▸ **時間：** ${timestamp}\n\n` +
-      `請於 30 分鐘內完成接待確認。`
-    );
-  }
-
-  // ── 2. 場次分流通知 ───────────────────────
-  const sceneMessage =
-    `📋 **【新報名通知】**\n\n` +
-    `▸ **姓名：** ${name}\n` +
-    `▸ **場次：** ${scene}\n` +
-    `▸ **時間：** ${timestamp}`;
-
-  if (scene === "A場：週六上午") {
-    sendToDiscord(WEBHOOK_SCENE_A, sceneMessage);
-  } else if (scene === "B場：週六下午") {
-    sendToDiscord(WEBHOOK_SCENE_B, sceneMessage);
-  } else if (scene === "C場：週日全天") {
-    sendToDiscord(WEBHOOK_SCENE_C, sceneMessage);
-  }
-
-  // ── 3. OCR 收據辨識 ───────────────────────
-  // 只有上傳了收據才執行
-  if (receiptUrl && receiptUrl.includes("drive.google.com")) {
-
-    const ocrText = runOcr(receiptUrl);
-    updateSheet(rowNumber, ocrText);
-
-    sendToDiscord(WEBHOOK_AI_OCR,
-      `💰 **【收據辨識通知】**\n\n` +
-      `系統已自動辨識新報名者的匯款收據，請人工覆核。\n\n` +
-      `▸ **報名者：** ${name}\n` +
-      `▸ **場次：** ${scene}\n\n` +
-      `**OCR 辨識結果：**\n` +
-      `${ocrText}\n\n` +
-      `⚠️ 辨識結果僅供參考，請開啟試算表確認金額是否正確。\n` +
-      `**黃金原則：自動化負責苦力，人類負責最終決策。**`
-    );
-  }
-}
-
-// ====== 測試函式 ======
-function testOnFormSubmit() {
-  const fakeEvent = {
-    range: { getRow: () => 2 },
-    values: [
-      "2026/03/24 14:00:00",
-      "王小明",
-      "wang@test.com",
-      "C場：週日全天",
-      "0912345678",
-      "是",
-      "https://drive.google.com/open?id=你的測試收據圖片ID"
-    ]
-  };
-  onFormSubmit(fakeEvent);
-}
-
-// ====== 除錯函式（OCR 失敗時使用）======
-function debugDownload() {
-  const driveUrl = "https://drive.google.com/open?id=你的測試收據圖片ID";
-  const fileId = driveUrl.replace("https://drive.google.com/open?id=", "");
-  const downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
-
-  const response = UrlFetchApp.fetch(downloadUrl, {
-    followRedirects: true,
-    muteHttpExceptions: true
-  });
-
-  Logger.log("Status code: " + response.getResponseCode());
-  Logger.log("Content type: " + response.getHeaders()["Content-Type"]);
-  Logger.log("Content length: " + response.getContent().length);
-  Logger.log("First 500 chars: " + response.getContentText().substring(0, 500));
-}
-```
-
-> [!WARNING]
-> **兩個地方需要特別確認：**
->
-> 1. `values[6]` 對應的是收據上傳欄位，
->    如果你的表單欄位順序不同，請對應調整數字。
->
-> 2. `SPREADSHEET_ID` 是試算表網址中 `/d/` 和 `/edit` 之間的那串字：
->    ```
->    https://docs.google.com/spreadsheets/d/【這裡就是ID】/edit#gid=874013079
->    ```
->    注意：`gid=` 後面的數字是工作表編號，不是試算表 ID。
-
-<img width="1047" height="924" alt="image" src="https://github.com/user-attachments/assets/e03ea735-614d-48e3-8721-57df129772d1" />
-
-
----
-
-### 📌 步驟四：測試
-
-#### 先用測試函式驗證
-
-1. 把 `testOnFormSubmit` 裡的圖片 ID 換成試算表裡真實的收據圖片 ID
-2. 函式選單切換到 `testOnFormSubmit` → 點「**▶ 執行**」
-3. 確認以下全部正確：
-
-    | 檢查項目 | 預期結果 |
-    |---------|---------|
-    | `#vip-報名警報` | ✅ 收到 VIP 警報 |
-    | `#c場次報到` | ✅ 收到場次通知 |
-    | `#ai辨識` | ✅ 收到 OCR 覆核通知 |
-    | 試算表 `AI判讀結果` 欄 | ✅ 自動填入辨識文字 |
-
-<img width="1008" height="750" alt="image" src="https://github.com/user-attachments/assets/0ba44908-60d4-49c5-a984-a2218dad0744" />
-<img width="750" height="739" alt="image" src="https://github.com/user-attachments/assets/a6ebb98e-4f14-4e04-9ad9-d2135c41b0fb" />
-<img width="372" height="239" alt="image" src="https://github.com/user-attachments/assets/e5beffca-acfb-4ebd-bd5c-2081761e3d38" />
-<img width="292" height="121" alt="image" src="https://github.com/user-attachments/assets/dd8a46f1-e364-47c3-b469-f8d020ac723f" />
-<img width="163" height="440" alt="image" src="https://github.com/user-attachments/assets/f4c57c3a-5e74-4a4d-8f90-f1c66d4a25cc" />
-
----
-
-#### 若 OCR 失敗，先執行除錯函式
-
-1. 把 `debugDownload` 裡的圖片 ID 換成真實 ID
-2. 函式選單切換到 `debugDownload` → 點「**▶ 執行**」
-3. 點擊下方「**執行記錄**」，確認輸出：
-
-    | Content type 顯示 | 代表意思 |
-    |------------------|---------|
-    | `application/pdf` | 檔案是 PDF，程式會自動處理 ✅ |
-    | `image/jpeg` | 檔案是 JPG 圖片 ✅ |
-    | `text/html` | 下載失敗，檢查 Drive 資料夾是否已設為公開 ❌ |
-
-<img width="790" height="932" alt="image" src="https://github.com/user-attachments/assets/6a30af23-ad35-4645-8cb8-d9653f18b6e2" />
-<img width="542" height="465" alt="image" src="https://github.com/user-attachments/assets/652fe334-2dbd-4da3-a41b-36b5499db809" />
-
----
-
-#### 觸發條件不需要重新設定
-
-Part 1 已設定好「提交表單時執行 `onFormSubmit`」，
-完整版主函式名稱相同，**不需要重新設定觸發條件**。
-
----
-
-### 為什麼 GAS 能自動判斷 PDF 或圖片？
-
-> [!NOTE]
-> Make 版本需要手動在 Field 2 填入 `receipt.jpg` 作為檔案名稱。
-> GAS 版本則會自動偵測，不需要人工判斷：
->
-> ```
-> 下載檔案
->     │
->     ├→ Content-Type 包含 "pdf"          → receipt.pdf
->     ├→ Content-Type 包含 "png"          → receipt.png
->     ├→ Content-Type 包含 "jpeg"/"jpg"   → receipt.jpg
->     └→ 以上都不符合，看檔案開頭：
->           ├→ 開頭是 "%PDF"              → receipt.pdf
->           └→ 其他                       → receipt.jpg（預設）
-> ```
->
-> Google Drive 有時會把圖片轉成 PDF 格式儲存，
-> 自動判斷讓系統不管使用者上傳什麼格式都能正確處理。
-
----
-
-### 完整程式碼對照表：GAS vs Make
-
-| GAS 程式碼 | 對應的 Make 功能 |
-|-----------|----------------|
-| `const values = e.values` | Google Sheets Watch Rows 取得資料 |
-| `if (isVip === "是")` | Make Filter 過濾器 |
-| `sendToDiscord(WEBHOOK_VIP, ...)` | Discord Send Message 節點 |
-| `if / else if` 場次判斷 | Make Router 多路分流 |
-| `runOcr(receiptUrl)` | HTTP Download + OCR.space 節點 |
-| `updateSheet(rowNumber, ocrText)` | Google Sheets Update Row 節點 |
-| 觸發條件「提交表單時」 | Make Scenario 的 Form Trigger |
-
----
-
-### Make vs Apps Script 最終選擇建議
-
-| 情境 | 建議工具 |
-|------|---------|
-| 報名人數 < 200 人 | Make 免費版就夠 |
-| 報名人數 > 200 人 | Apps Script |
-| 需要串接非 Google 的服務 | Make（支援 1,000+ 種服務）|
-| 所有流程都在 Google 生態系內 | Apps Script（更快更穩）|
-| 完全不想寫任何程式碼 | Make |
-| 想學一點程式基礎 | Apps Script |
-
-> [!TIP]
-> **學習路徑建議：**
-> ```
-> Make（理解自動化邏輯，No-Code 入門）
->     ↓
-> GAS Part 1（VIP 警報 + 場次分流，看懂程式碼和 Make 的對應關係）
->     ↓
-> GAS Part 2（加入 OCR，學會呼叫外部 API 與處理檔案）
->     ↓
-> 期末專題：自選情境，自己設計整套系統
-> ```
-
-### 📚 課後自學資源
+### 📚 本週自學資源
 
 | 資源 | 用途 |
 |------|------|
-| [OCR.space API 文件](https://ocr.space/ocrapi) | 所有 API 參數說明 |
-| [Make 官方教學](https://www.make.com/en/help) | 所有模組的使用說明 |
-| [Discord Webhook 說明](https://support.discord.com/hc/en-us/articles/228383668) | Webhook 進階設定 |
+| [Make 官方：Router 說明](https://www.make.com/en/help/tools/router) | Router 進階設定 |
+| [Make 官方：Iterator 說明](https://www.make.com/en/help/tools/iterator) | Iterator 使用方式 |
+| [Make 官方：Error Handling](https://www.make.com/en/help/errors/error-handling) | 三種錯誤處理策略詳解 |
 
 ---
 
 ### 📝 下週預告
 
-> 🔜 **Week 02：Google 表單魔法 — 從問卷到自動化文件工廠**
+> 🔜 **Week 04：Notion 架站 — 免寫程式，打造你的第一個對外網站**
 >
-> - 條件跳題邏輯：表單根據填答者選擇自動跳到不同題組
-> - 資料驗證：用正規表達式阻擋不合格的填答
-> - 測驗模式：自動批改、即時回饋、統計全班答題狀況
-> - AutoCrat 批次模式：一鍵產出 100 份個人化 PDF
-> - Google 試算表 10 個核心公式
+> - Notion 頁面結構設計（資料庫、Gallery、Kanban）
+> - Super.so 或 Notion Sites 一鍵發布為公開網站
+> - 自訂網域、SEO 基礎設定
+> - 把實習處理中心的資訊整合成一個對外的說明頁面
 >
-> **課前任務：** 確認你的 Google 帳號能正常登入 Google 表單和試算表。
+> **課前任務：** 確認你的 Notion 帳號可以正常登入，並瀏覽幾個用 Notion 做的網站感受一下效果。
 
 ---
 
 *雲端與數位內容管理 ｜ 國立金門大學 工業工程與管理學系 ｜ 2026 春季學期*
-*Week 01 of 14*
+*Week 03 of 14*
