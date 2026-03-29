@@ -359,14 +359,14 @@
     - `實習天數`（等等用公式計算）
     - `審核狀態`（手動填入：待審核／已核准／退件）
 
-4. 在 `實習天數` 欄位輸入公式（假設開始日期在 H 欄、結束日期在 I 欄）：
+4. 在 `實習天數` 欄位輸入公式（假設開始日期在 O 欄、結束日期在 P 欄）：
 ```
-    =IFERROR(I2-H2, "日期待填寫")
+    =IFERROR(O2-P2, "日期待填寫")
 ```
 
-<img width="679" height="362" alt="image" src="https://github.com/user-attachments/assets/b325c0a2-32e4-48ca-b318-b02c5205ffe2" />
-<img width="648" height="409" alt="image" src="https://github.com/user-attachments/assets/3c598afa-aff0-41df-9696-9c0652056c11" />
-
+<img width="549" height="198" alt="image" src="https://github.com/user-attachments/assets/38b738f5-aeb9-413b-a299-d47eb849e8a6" />
+<img width="300" height="166" alt="image" src="https://github.com/user-attachments/assets/0bda38be-9851-4906-b3be-bb93c4e11358" />
+<img width="481" height="372" alt="image" src="https://github.com/user-attachments/assets/c242c815-2dd8-4885-a0cf-41ff333f63e0" />
 
 ---
 
@@ -383,6 +383,10 @@
     | Output name | `<<姓名>>_<<學號>>_實習同意書` |
     | Output type | **PDF** |
     | Output folder | Drive 的 `03_最終定稿` 資料夾 |
+
+<img width="799" height="694" alt="image" src="https://github.com/user-attachments/assets/33ec47f2-b1df-438f-b8b0-a7faf47f43cf" />
+<img width="643" height="412" alt="image" src="https://github.com/user-attachments/assets/cc238f42-15e4-496b-8d57-ef45edc561c9" />
+
 
 4. **標籤對應**（將每個 `<<標籤>>` 對應到試算表欄位）：
 
@@ -416,7 +420,10 @@
         工管系實習處理中心 敬上
 ```
 
-<!-- 📸 截圖：AutoCrat 標籤對應設定畫面 -->
+<img width="651" height="414" alt="image" src="https://github.com/user-attachments/assets/43237264-1b99-4353-9a87-d5c140f759af" />
+<img width="650" height="410" alt="image" src="https://github.com/user-attachments/assets/bc7bb422-f242-434a-8db5-84880ebb47f9" />
+<img width="640" height="403" alt="image" src="https://github.com/user-attachments/assets/d65e3ee3-50a7-4ba4-ab62-3a563c8728c3" />
+<img width="651" height="409" alt="image" src="https://github.com/user-attachments/assets/8ae5bd56-7a79-429d-9f74-64a4b75723fb" />
 
 ---
 
@@ -431,8 +438,11 @@
 3. 系統掃描試算表中所有尚未產出的資料列，逐一生成 PDF 並寄出
 4. 執行完成後，前往 Google Drive 的 `03_最終定稿` 資料夾確認 PDF
 
-<!-- 📸 截圖：Drive 資料夾顯示多份 PDF 的畫面 -->
-<!-- 📸 截圖：信箱收到實習同意書的畫面 -->
+<img width="648" height="403" alt="image" src="https://github.com/user-attachments/assets/3e6de451-a317-42b0-ac5b-fa0df64f7fd0" />
+<img width="561" height="95" alt="image" src="https://github.com/user-attachments/assets/7ec6c472-1772-45dd-b869-960d0fa30170" />
+<img width="519" height="349" alt="image" src="https://github.com/user-attachments/assets/71ca610c-2123-4f34-86a3-84b1197787b7" />
+<img width="584" height="156" alt="image" src="https://github.com/user-attachments/assets/01f91e48-98ea-4792-8274-847506b14c93" />
+
 
 > [!TIP]
 > **🏆 第 2 小時 Checkpoint 完成！**
