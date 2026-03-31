@@ -75,18 +75,18 @@
 |---------|---------|
 | 國內企業實習 | `#國內實習-審核` |
 | 海外實習 | `#海外實習-審核` |
-| 自行開發 | `#自開發-審核` |
+| 自行開發 | `#自行開發-審核` |
 
 #### 步驟一：在 Discord 建立三個頻道並取得 Webhook URL
 
 依照 Week 01 的方式，為以下三個頻道各建立一個 Webhook：
 - `#國內實習-審核`
 - `#海外實習-審核`
-- `#自開發-審核`
+- `#自行開發-審核`
 
 把三個 Webhook URL 分別貼到記事本備用。
 
-<!-- 📸 截圖：Discord 三個頻道建立完成 -->
+<img width="341" height="346" alt="image" src="https://github.com/user-attachments/assets/f0f7b4a4-0aa7-4b4a-9e1f-aebc99c767f4" />
 
 ---
 
@@ -96,7 +96,8 @@
 2. 新增觸發器：**Google Sheets → Watch New Rows**
 3. 連結到 Week 02 的實習申請試算表
 
-<!-- 📸 截圖：Google Sheets 觸發器設定 -->
+<img width="519" height="393" alt="image" src="https://github.com/user-attachments/assets/ae0c3e0a-1cde-4236-b7fd-734343537f0a" />
+<img width="728" height="575" alt="image" src="https://github.com/user-attachments/assets/5927f8e5-db5d-4c46-b994-5d6d1f4e65d2" />
 
 ---
 
@@ -106,21 +107,21 @@
 2. 搜尋「**Flow Control**」→ 選擇「**Router**」
 3. Router 會自動展開成兩條支線，你可以繼續點擊「**+**」新增第三條
 
-<!-- 📸 截圖：Router 模組展開後的三條支線畫布 -->
+<img width="835" height="780" alt="image" src="https://github.com/user-attachments/assets/39e277a5-6933-4551-ae14-6b034aee52cb" />
 
 ---
 
 #### 步驟四：為每條支線設定過濾條件
 
-**支線 1 — 國內企業實習：**
+**支線 1 — 國內實習：**
 
 1. 點擊支線 1 上的**扳手圖示（Filter）**
 2. 設定：
 
     | 設定項目 | 填入內容 |
     |---------|---------|
-    | Label | `國內企業實習` |
-    | Condition | `實習類型` → `Equal to (text)` → `國內企業實習` |
+    | Label | `國內實習` |
+    | Condition | `實習類型` → `Equal to (text)` → `國內企業` |
 
 **支線 2 — 海外實習：**
 
@@ -128,9 +129,10 @@
 
 **支線 3 — 自行開發：**
 
-條件：`實習類型` Equal to `自行開發實習單位`
+條件：`實習類型` Equal to `自行開發`
 
-<!-- 📸 截圖：其中一條支線的 Filter 設定畫面 -->
+<img width="442" height="439" alt="image" src="https://github.com/user-attachments/assets/e4eec0a0-1a8e-4e37-bb44-9f9596f10c4d" />
+<img width="806" height="718" alt="image" src="https://github.com/user-attachments/assets/edd75143-f663-4474-94f0-14e431c42084" />
 
 ---
 
@@ -138,6 +140,8 @@
 
 每條支線各自新增一個 **Discord → Send a Message by Webhook Bot**，
 填入對應頻道的 Webhook URL 和通知訊息：
+
+<img width="413" height="656" alt="image" src="https://github.com/user-attachments/assets/766f960a-2940-4631-b674-1cd733cd1309" />
 
 **支線 1 訊息範例：**
 ```
