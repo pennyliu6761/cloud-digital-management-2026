@@ -578,16 +578,21 @@
 
 #### 公式 4：`UNIQUE` & `COUNTIF` — 統計各實習類型人數
 
-在試算表空白區建立統計表
-M 欄輸入類型 - 挑選不重複資料
+在試算表空白區建立統計表(實習類型&人數)
+**M2** 輸入 - 挑選不重複資料
 ```
 =UNIQUE($C:$C)
 ```
 
-，N 欄輸入 - 計算吻合條件的次數
+<img width="366" height="160" alt="image" src="https://github.com/user-attachments/assets/dfbe64a6-868a-4538-ade8-8e47bba14360" />
+
+**N2** 輸入 - 計算吻合條件的次數
 ```
 =COUNTIF($C:$C, M2)
 ```
+
+<img width="329" height="146" alt="image" src="https://github.com/user-attachments/assets/3a18d750-8539-4fab-89ee-184b6604e0a0" />
+
 
 **用途：** 立刻知道各類型各有幾人，不需要手動數。
 
@@ -601,6 +606,8 @@ M 欄輸入類型 - 挑選不重複資料
 ```
 **用途：** `COUNTIF` 的進階版，可同時設定多個條件。
 
+<img width="671" height="275" alt="image" src="https://github.com/user-attachments/assets/dc9a4117-db7c-4219-b3ca-c59ec9e3e58a" />
+
 ---
 
 #### 公式 6：`SUMIF` — 條件加總
@@ -610,6 +617,8 @@ M 欄輸入類型 - 挑選不重複資料
 =SUMIF($H:$H, "已核准", $G:$G)
 ```
 
+<img width="432" height="104" alt="image" src="https://github.com/user-attachments/assets/582b8b17-b7db-41ae-b881-a5dce23303d8" />
+
 ---
 
 #### 公式 7：`AVERAGEIF` — 條件平均
@@ -618,6 +627,8 @@ M 欄輸入類型 - 挑選不重複資料
 ```
 =AVERAGEIF($C:$C, "海外實習", $G:$G)
 ```
+
+<img width="579" height="117" alt="image" src="https://github.com/user-attachments/assets/4e68561a-b099-4ad8-933b-cd6c03dc6a1a" />
 
 ---
 
@@ -644,6 +655,8 @@ M 欄輸入類型 - 挑選不重複資料
 - `FALSE`：精確比對
 - `IFERROR(..., "查無聯絡窗口")`：找不到時顯示提示，不顯示難看的 `#N/A`
 
+<img width="712" height="259" alt="image" src="https://github.com/user-attachments/assets/07c0db44-0f50-4fe5-8271-fc15eb027f04" />
+
 ---
 
 #### 公式 9：`TEXT` — 格式化日期
@@ -653,6 +666,8 @@ M 欄輸入類型 - 挑選不重複資料
 **輸出範例：** `2026年07月01日`
 
 **用途：** AutoCrat 模板中，讓日期顯示中文格式，而不是 `2026/7/1`。
+
+<img width="478" height="267" alt="image" src="https://github.com/user-attachments/assets/d1461dcf-1122-4c03-9bbc-5d51d6bfa46b" />
 
 ---
 
@@ -665,7 +680,7 @@ M 欄輸入類型 - 挑選不重複資料
 
 **輸出結果：** 自動篩選出所有已核准的申請，依實習類型排序，原始資料更新時同步更新。
 
-<!-- 📸 截圖：QUERY 函數篩選結果畫面 -->
+<img width="695" height="199" alt="image" src="https://github.com/user-attachments/assets/a45d9298-5eac-4386-b60a-e1a8ada4cd58" />
 
 > [!TIP]
 > **🏆 第 3 小時 Checkpoint 完成！**
