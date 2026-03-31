@@ -555,15 +555,20 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
 
 1. 新建劇本
 2. 觸發器選 **Google Sheets → Watch Changes**（不是 Watch New Rows）
+
+<img width="706" height="593" alt="image" src="https://github.com/user-attachments/assets/d15f7de4-9467-4de0-acea-d9d09c93b650" />
+<img width="1419" height="567" alt="image" src="https://github.com/user-attachments/assets/4a73b99e-d793-490b-ad2e-57f685d402a3" />
+<img width="1866" height="942" alt="image" src="https://github.com/user-attachments/assets/385c260d-891f-416d-9f4b-d75adfb223b9" />
+
 3. 設定：
 
     | 設定項目 | 填入內容 |
     |---------|---------|
     | Spreadsheet | 實習申請試算表 |
-    | Sheet | 表單回覆 1 |
+    | Sheet | 實習申請 |
     | Trigger On | `Updated rows`（監控列的修改）|
 
-<!-- 📸 截圖：Watch Changes 觸發器設定 -->
+<img width="896" height="714" alt="image" src="https://github.com/user-attachments/assets/f5d8f19c-79e0-446e-be6f-cfa5068e7d79" />
 
 ---
 
@@ -573,6 +578,8 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
 2. 條件：`審核狀態` Equal to `已核准`
 
 這樣只有當審核狀態被改成「已核准」時，後續流程才會執行。
+
+<img width="1282" height="779" alt="image" src="https://github.com/user-attachments/assets/d0ad2e9d-f309-4e4b-aca7-dff574dbdab1" />
 
 ---
 
@@ -591,10 +598,16 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
     系統正在產出實習同意書，請稍候...
 ```
 
+<img width="1182" height="749" alt="image" src="https://github.com/user-attachments/assets/9fbee8f0-b04f-422a-9c0b-a89044cee681" />
+
 2. 回到試算表，把某一筆申請的「審核狀態」欄位改為「已核准」
 3. 確認 Discord 收到通知
 
-<!-- 📸 截圖：試算表修改審核狀態後，Discord 收到通知 -->
+<img width="935" height="680" alt="image" src="https://github.com/user-attachments/assets/9ac235d9-6908-46aa-a8d2-f03f4ac0d814" />
+<img width="930" height="398" alt="image" src="https://github.com/user-attachments/assets/f00e3073-e6a5-40ee-934f-c00ffec760f8" />
+<img width="1161" height="581" alt="image" src="https://github.com/user-attachments/assets/97ae13a7-3dbd-4688-b9c8-d622c75e09c0" />
+<img width="382" height="151" alt="image" src="https://github.com/user-attachments/assets/9951e70d-d015-4ff3-84c9-c36e825a4f99" />
+
 
 > [!TIP]
 > **🏆 第 3 小時 Checkpoint 完成！**
