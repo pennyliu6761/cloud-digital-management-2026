@@ -473,7 +473,7 @@ Discord 推播：「OCR 流程發生錯誤！錯誤訊息：...」
 
 Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
 
-<!-- 📸 截圖：OCR 節點下方出現錯誤處理路線 -->
+<img width="1176" height="419" alt="image" src="https://github.com/user-attachments/assets/c3f9344b-0741-499a-b70c-5c67c7457d7f" />
 
 ---
 
@@ -494,7 +494,7 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
     ⚠️ 請立即登入 Make 查看錯誤詳情，並手動處理這筆資料。
 ```
 
-<!-- 📸 截圖：錯誤路線的 Discord 通知設定 -->
+<img width="1017" height="728" alt="image" src="https://github.com/user-attachments/assets/be053eee-56ff-4cc8-8b92-6d279b216d61" />
 
 ---
 
@@ -511,10 +511,9 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
     | 錯誤時間 | `{{now}}` |
     | 申請人 | `{{姓名}}` |
     | 錯誤訊息 | `{{error.message}}` |
-    | 錯誤模組 | `{{error.name}}` |
     | 處理狀態 | `待處理`（固定文字） |
 
-<!-- 📸 截圖：Google Sheets Add a Row 設定畫面 -->
+<img width="651" height="441" alt="image" src="https://github.com/user-attachments/assets/38629cc2-46c2-4b36-bd09-56f6ab907cf4" />
 
 ---
 
@@ -534,8 +533,8 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
     - Discord `#系統錯誤警報` 頻道收到錯誤通知
     - 試算表「系統錯誤記錄」新增了一筆錯誤記錄
 
-<!-- 📸 截圖：Discord 收到錯誤警報通知 -->
-<!-- 📸 截圖：試算表錯誤記錄新增一筆 -->
+<img width="518" height="146" alt="image" src="https://github.com/user-attachments/assets/afdbbf65-79bd-47b7-b214-77bc4f6ae32c" />
+<img width="923" height="248" alt="image" src="https://github.com/user-attachments/assets/09f1f70f-952e-4aa6-a4c5-f05bbb4b1e55" />
 
 5. 測試完成後，把 API Key 改回正確的值
 
