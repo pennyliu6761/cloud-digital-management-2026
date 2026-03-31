@@ -534,6 +534,8 @@
 
 ---
 
+<img width="780" height="422" alt="image" src="https://github.com/user-attachments/assets/00c2a401-046e-4c9b-a915-aa94dd79daef" />
+
 ### 📌 任務 3-2：10 個核心公式逐一實作
 
 ---
@@ -546,6 +548,8 @@
 ```
 **輸出範例：** `61`（天數）
 
+<img width="442" height="273" alt="image" src="https://github.com/user-attachments/assets/9f08bd72-0409-4b34-97cb-70f4f882ae04" />
+
 **用途：** 計算合約天數、保固剩餘天數、員工年資。
 
 ---
@@ -557,6 +561,8 @@
 =IF(I2>=30, "✅ 符合最低天數", "❌ 不足 30 天")
 ```
 
+<img width="527" height="264" alt="image" src="https://github.com/user-attachments/assets/a2ff5e4b-5899-45e8-a28a-1fb307adbbf9" />
+
 ---
 
 #### 公式 3：`IFS` — 多條件薪資等級分類
@@ -566,14 +572,23 @@
 =IFS(G2>=40000, "A級", G2>=30000, "B級", G2>=25000, "C級", G2=0, "無薪實習", TRUE, "資料待確認")
 ```
 
+<img width="616" height="262" alt="image" src="https://github.com/user-attachments/assets/1af7fe7c-750a-4843-9796-4413ee4e2a31" />
+
 ---
 
-#### 公式 4：`COUNTIF` — 統計各實習類型人數
+#### 公式 4：`UNIQUE` & `COUNTIF` — 統計各實習類型人數
 
-在試算表空白區建立統計表，M 欄輸入類型，N 欄輸入：
+在試算表空白區建立統計表
+M 欄輸入類型 - 挑選不重複資料
+```
+=UNIQUE($C:$C)
+```
+
+，N 欄輸入 - 計算吻合條件的次數
 ```
 =COUNTIF($C:$C, M2)
 ```
+
 **用途：** 立刻知道各類型各有幾人，不需要手動數。
 
 ---
