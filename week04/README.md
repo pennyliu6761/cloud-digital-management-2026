@@ -540,8 +540,9 @@ List View   → 簡潔的清單模式
 3. 點擊「**Publish**」按鈕
 4. 發布完成後，點擊「**View site**」查看公開頁面
 
-<!-- 📸 截圖：Notion Sites 發布設定畫面 -->
-<!-- 📸 截圖：發布後的公開網站畫面（瀏覽器視角）  -->
+<img width="1804" height="1072" alt="image" src="https://github.com/user-attachments/assets/ec378fd4-0c16-42ac-8689-68ea7d6074c2" />
+<img width="1630" height="1127" alt="image" src="https://github.com/user-attachments/assets/3ef79fda-9403-491f-9032-e19e38ee5433" />
+
 
 > [!NOTE]
 > **免費版 vs 付費版的差異：**
@@ -549,12 +550,10 @@ List View   → 簡潔的清單模式
 > | 功能 | 免費版 | 付費版 |
 > |------|--------|--------|
 > | 發布頁面數量 | 無限 | 無限 |
-> | 網址格式 | `notion.site/xxxxx` | 可自訂 slug |
+> | 網址格式 | `notion.so/xxxxx` | 可自訂 slug |
 > | 搜尋引擎索引 | ✅ 可開啟 | ✅ 可開啟 |
 > | 主題客製化 | ❌ | ✅ |
 > | Google Analytics | ❌ | ✅ |
->
-> 免費版對教學用途完全夠用！
 
 ---
 
@@ -573,7 +572,10 @@ Notion Sites 的子頁面需要**各自發布**，首頁發布不代表子頁面
 > 訪客點擊首頁的「查看合作企業」按鈕會看到「無法存取」的錯誤。
 > 記得每個子頁面都要單獨發布！
 
-<!-- 📸 截圖：所有子頁面發布後的 Notion 側邊欄（每個頁面旁有 🌐 圖示） -->
+<img width="1821" height="710" alt="image" src="https://github.com/user-attachments/assets/84f44110-fe3c-461c-b094-c2954fe759ea" />
+<img width="1827" height="697" alt="image" src="https://github.com/user-attachments/assets/2ff245da-5a3e-4f1e-ac5b-927b607f98b4" />
+<img width="1831" height="828" alt="image" src="https://github.com/user-attachments/assets/5144c4cc-ac1f-4234-9ca5-f26e9acf02a7" />
+<img width="1818" height="879" alt="image" src="https://github.com/user-attachments/assets/ed37d1d4-5f26-4208-9d67-bd513b4f9b1f" />
 
 ---
 
@@ -587,14 +589,16 @@ Notion Sites 的子頁面需要**各自發布**，首頁發布不代表子頁面
 
 測試：在公開網址上點擊每個快速導覽，確認可以正確跳轉。
 
-<!-- 📸 截圖：公開網站首頁，滑鼠 hover 在連結上的效果 -->
+<img width="1071" height="534" alt="image" src="https://github.com/user-attachments/assets/b1a66a69-03fc-4f75-b3e1-c64b90d02939" />
+<img width="1203" height="533" alt="image" src="https://github.com/user-attachments/assets/a5d86a8e-dc3d-4129-92d8-9242642025d8" />
+<img width="1274" height="588" alt="image" src="https://github.com/user-attachments/assets/1185bed7-5721-4009-8dcd-a20704ebf7fd" />
 
 ---
 
 ### 📌 任務 3-4：Notion Sites vs GitHub Pages 比較實驗
 
 打開兩個分頁，分別查看：
-- **你的 Notion Site**：`https://notion.site/xxx`
+- **你的 Notion Site**：`https://notion.so/xxx`
 - **一個 GitHub Pages 網站範例**：`https://pennyliu6761.github.io`（或任何 GitHub Pages 網站）
 
 觀察並填寫以下比較表（貼到課堂共用文件）：
@@ -617,13 +621,14 @@ Notion Sites 的子頁面需要**各自發布**，首頁發布不代表子頁面
 ### 📌 任務 3-5：產生 QR Code 讓學生掃描進入網站
 
 1. 複製你的 Notion Site 網址
-2. 前往 [qr-code-generator.com](https://www.qr-code-generator.com/)（免費，不需要帳號）
+2. 前往 [免費 QR Code 產生器
+]([https://www.qr-code-generator.com/](https://quickmark.com.tw/cht/qrcode-datamatrix-generator/default.asp?qrLink))（免費，不需要帳號）
 3. 貼上網址，下載 QR Code 圖片
 4. 把 QR Code 嵌入到 Notion 首頁的顯眼位置
 
 **用途：** 課堂上直接讓學生用手機掃描進入網站，不需要打網址。
 
-<!-- 📸 截圖：Notion 首頁顯示 QR Code 的畫面 -->
+<img width="1692" height="989" alt="image" src="https://github.com/user-attachments/assets/fe4c9bf9-c2d5-401b-adcf-6abd30ecd682" />
 
 > [!TIP]
 > **🏆 第 3 小時 Checkpoint 完成！**
