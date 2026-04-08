@@ -402,7 +402,10 @@ List View   → 簡潔的清單模式
 3. 回到 Notion 首頁，在快速導覽下方輸入 `/embed`
 4. 貼上 Google 表單連結 → 點擊「**Embed link**」
 
-<!-- 📸 截圖：Google 表單成功嵌入 Notion 頁面 -->
+<img width="1322" height="698" alt="image" src="https://github.com/user-attachments/assets/f28452a5-0c35-4144-be45-6d8000d3bd7d" />
+<img width="1003" height="525" alt="image" src="https://github.com/user-attachments/assets/e13a675b-dda0-4105-9b98-af0f4c7ba2e9" />
+<img width="1106" height="723" alt="image" src="https://github.com/user-attachments/assets/1ba06e13-b598-4f0e-9d7e-10222adaf9bd" />
+
 
 > [!NOTE]
 > **嵌入 vs 連結的差異：**
