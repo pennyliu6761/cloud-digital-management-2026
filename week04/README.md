@@ -101,7 +101,9 @@ CMS 網站架構：
 2. 點擊頁面頂部「**Add cover**」→ 選擇一張適合的封面圖
 3. 點擊「**Add icon**」→ 選擇 `🏢` emoji
 
-<!-- 📸 截圖：Notion 頁面封面和 icon 設定完成 -->
+<img width="590" height="348" alt="image" src="https://github.com/user-attachments/assets/8153de57-a800-42a5-8c62-6c478618420e" />
+<img width="1153" height="494" alt="image" src="https://github.com/user-attachments/assets/0aa31063-5e6a-41c2-9459-e4f5890a7786" />
+<img width="1298" height="668" alt="image" src="https://github.com/user-attachments/assets/1024cf6c-ab3c-4cc4-abeb-22e0dc105f17" />
 
 ---
 
@@ -129,7 +131,9 @@ CMS 網站架構：
 | 欄 2 | 🏢 | 查看合作企業 | 瀏覽本學期合作企業清單 → |
 | 欄 3 | ❓ | 常見問題 | 申請前先看這裡，解決 90% 的疑問 → |
 
-<!-- 📸 截圖：首頁三欄 Callout 設計完成 -->
+<img width="735" height="455" alt="image" src="https://github.com/user-attachments/assets/c2340446-bbaf-4d6a-9380-0151b747237f" />
+<img width="212" height="269" alt="image" src="https://github.com/user-attachments/assets/94d0b0d0-a1be-4945-bd05-bc201415277a" />
+<img width="1304" height="863" alt="image" src="https://github.com/user-attachments/assets/39002601-47c9-4bf5-aa64-91582ea09528" />
 
 **最新公告區（Toggle Block）：**
 
