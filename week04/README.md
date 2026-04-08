@@ -426,11 +426,13 @@ List View   → 簡潔的清單模式
 3. 在 Notion 頁面輸入 `/embed` → 貼上嵌入碼
 
 > [!WARNING]
-> Notion 的 Embed 只支援 URL，不支援 HTML 代碼。
+> Notion 的 Embed 只支援 **URL**，不支援 HTML 代碼。
 > 若嵌入碼是 `<iframe>` 格式，需要先用工具轉換成公開 URL，
 > 或直接貼上 Looker Studio 的分享連結（Report URL）。
 
-<!-- 📸 截圖：Looker Studio 圖表嵌入 Notion 後的畫面 -->
+<img width="1622" height="811" alt="image" src="https://github.com/user-attachments/assets/cca6a382-8df1-4346-95ae-998c9e865b89" />
+<img width="1194" height="770" alt="image" src="https://github.com/user-attachments/assets/75f89dd6-b8ff-44f5-bc62-1a5b417f2ba6" />
+<img width="1640" height="1065" alt="image" src="https://github.com/user-attachments/assets/0abb9ef1-c60f-4111-9f72-4da658748bcf" />
 
 ---
 
@@ -458,7 +460,9 @@ List View   → 簡潔的清單模式
 2. 點擊「**分享**」→「**嵌入地圖**」→ 複製連結
 3. 在 Notion 頁面 `/embed` 貼上
 
-<!-- 📸 截圖：聯絡系辦頁面含嵌入地圖 -->
+<img width="1845" height="973" alt="image" src="https://github.com/user-attachments/assets/1940fbf8-de1b-461e-8383-8a1b75902422" />
+<img width="1686" height="943" alt="image" src="https://github.com/user-attachments/assets/8d852680-4c79-4fed-96bc-c46d05111e5c" />
+<img width="1666" height="945" alt="image" src="https://github.com/user-attachments/assets/f06be42f-380e-4b1e-871d-b17ac3077073" />
 
 > [!TIP]
 > **🏆 第 2 小時 Checkpoint 完成！**
