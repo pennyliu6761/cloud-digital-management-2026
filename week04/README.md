@@ -145,6 +145,9 @@ CMS 網站架構：
         實習起始日：2026/07/01
 ```
 
+<img width="430" height="374" alt="image" src="https://github.com/user-attachments/assets/0da76def-d355-4fd7-a89d-06f22c84d4ec" />
+<img width="401" height="238" alt="image" src="https://github.com/user-attachments/assets/0813feb9-cee4-4097-a8e3-90cbe2451a1c" />
+
 **系統說明區（2 欄）：**
 
 左欄：文字說明
@@ -159,13 +162,16 @@ CMS 網站架構：
 
 右欄：嵌入一張流程圖（使用 Notion 的 `/image` 上傳）
 
-<!-- 📸 截圖：首頁完整排版畫面 -->
+<img width="475" height="219" alt="image" src="https://github.com/user-attachments/assets/d406cf2b-8039-4057-ac4c-3c29b705fb40" />
+<img width="1076" height="896" alt="image" src="https://github.com/user-attachments/assets/f845099c-7c6e-4768-9fa8-ae7fb7343f48" />
 
 ---
 
 ### 📌 任務 1-3：建立申請說明頁
 
 開啟「📋 申請說明」子頁面，建立以下內容：
+
+<img width="363" height="720" alt="image" src="https://github.com/user-attachments/assets/cad568a1-6bb3-4aaf-9f2f-2e2169c9923b" />
 
 #### 申請條件（Callout Block）
 ```
@@ -207,7 +213,7 @@ CMS 網站架構：
 | 海外實習 | 實習同意書、護照影本、簽證影本、保險證明 |
 | 自行開發 | 實習同意書、統一編號證明、接洽說明書 |
 
-<!-- 📸 截圖：申請說明頁完整畫面 -->
+<img width="1205" height="983" alt="image" src="https://github.com/user-attachments/assets/5f073df8-da3d-493b-8f36-a8a43d212fc9" />
 
 ---
 
