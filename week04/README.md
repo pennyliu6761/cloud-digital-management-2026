@@ -338,7 +338,8 @@ List View   → 簡潔的清單模式
     | 是否開放申請 | Checkbox | |
     | 企業簡介 | Text | 100 字以內 |
 
-<!-- 📸 截圖：Database 欄位設定完成 -->
+<img width="770" height="352" alt="image" src="https://github.com/user-attachments/assets/6aeff02d-04d2-47ea-b058-bf60b36178a4" />
+<img width="1789" height="735" alt="image" src="https://github.com/user-attachments/assets/f63d4a2c-e94b-4507-86c9-61746647beb6" />
 
 ---
 
@@ -354,6 +355,8 @@ List View   → 簡潔的清單模式
 | 麥肯錫顧問 | 顧問 | 國內 | 台北 | 35,000-45,000 | ❌ |
 | 聯發科 | 半導體 | 國內 | 新竹 | 35,000-42,000 | ✅ |
 
+<img width="1775" height="724" alt="image" src="https://github.com/user-attachments/assets/a9854827-d167-4173-9fd3-ea4084407a78" />
+
 ---
 
 #### 步驟三：切換不同視圖
@@ -361,18 +364,32 @@ List View   → 簡潔的清單模式
 1. 點擊 Database 右上角「**+ Add a view**」
 2. 新增以下三種視圖：
 
+<img width="826" height="582" alt="image" src="https://github.com/user-attachments/assets/78dccae9-a7c2-4320-80ab-041195345213" />
+
 **Gallery View（卡片展示）：**
 - 適合讓學生瀏覽企業風格
 - 設定：Card preview → 企業簡介
 
+<img width="1298" height="790" alt="image" src="https://github.com/user-attachments/assets/e4e749ba-d4be-4b10-889e-a62c27a3bc71" />
+<img width="1276" height="695" alt="image" src="https://github.com/user-attachments/assets/1ca9d6b4-a83b-4e5e-a990-854d5f38d543" />
+
 **Board View（看板，依產業別分類）：**
 - 設定：Group by → 產業別
+
+<img width="1291" height="791" alt="image" src="https://github.com/user-attachments/assets/98081230-485a-4433-b48a-73f69ee6db03" />
 
 **Filter 篩選設定：**
 - 加入篩選：`是否開放申請` = `Checked`
 - 讓學生預設只看到目前開放申請的企業
 
-<!-- 📸 截圖：Gallery View 和 Board View 的展示畫面 -->
+<img width="1373" height="825" alt="image" src="https://github.com/user-attachments/assets/0ef505de-0cbf-47c7-8162-f2bda5ace1c5" />
+<img width="1539" height="519" alt="image" src="https://github.com/user-attachments/assets/b7cb1de7-d100-4740-a558-9e332a9b526e" />
+
+**List View (簡潔的清單模式)：**
+
+<img width="1311" height="695" alt="image" src="https://github.com/user-attachments/assets/9b734ad5-f364-45fd-943c-c1ba4aa81c4a" />
+<img width="1295" height="392" alt="image" src="https://github.com/user-attachments/assets/0a9b1e2b-e0fc-492e-9091-9fca4ab41ad3" />
+
 
 ---
 
