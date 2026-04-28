@@ -790,7 +790,7 @@ H2 — **計算實習天數**：
 | `1112001 ` | `王大明` | `WANG@NQU.EDU.TW` | ` 台積電 ` | `32,000` | `2026-3-1` |
 | `1112002` | `  李美麗  ` | `lee@nqu.edu.tw` | `台積電` | `45000` | `2026/03/02` |
 | `abc` | `陳志偉` | `chen@nqu` | `聯電` | `-5000` | `2026/03/05` |
-| `1113002` | `` | `lin@nqu.edu.tw` | `金門酒廠 ` | `25000` | `` |
+| `1113002` |  | `lin@nqu.edu.tw` | `金門酒廠 ` | `25000` |  |
 | `1112001 ` | `王大明` | `wang@nqu.edu.tw` | `台積電` | `32000` | `2026/03/01` |
 
 > 這張表刻意包含：多餘空格、大小寫不一致、格式錯誤、
@@ -849,11 +849,11 @@ Email 統一用 `LOWER`：
 
 ---
 
-#### 公式 5：`REGEXREPLACE` — 用正規表達式替換字元
+#### 公式 5：`SUBSTITUTE` — 替換字元
 
-去除月薪欄位裡的逗號，讓它變成純數字：
+去除月薪欄位裡的逗號，先讓它變成文字在替換","成為空字串""，最後再轉成純數字：
 ```
-=VALUE(REGEXREPLACE(dirty_data!E2, "[,]", ""))
+=VALUE(SUBSTITUTE(TEXT(E2,"0"), ",", ""))
 ```
 
 **效果：** `"32,000"` → `32000`（數字型態）
@@ -910,7 +910,8 @@ Email 統一用 `LOWER`：
 =IF(COUNTIF(dirty_data!$A$2:$A$6, TRIM(A2))>1, "⚠️ 重複", "✅ 唯一")
 ```
 
-<!-- 📸 截圖：cleaned_data 工作表，顯示清洗前後對照 -->
+<img width="444" height="160" alt="image" src="https://github.com/user-attachments/assets/dcd897c3-e385-4fb8-975b-e50d0ec51f66" />
+<img width="615" height="153" alt="image" src="https://github.com/user-attachments/assets/0478cd3f-5f28-465f-88b8-8690e5ed9b0d" />
 
 ---
 
