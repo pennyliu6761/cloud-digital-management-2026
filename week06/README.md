@@ -523,18 +523,18 @@
 
 輸入以下欄位標題和 8 筆資料：
 
-| 學號 | 姓名 | Email | 就讀年級 | 指導教授 |
-|------|------|-------|---------|---------|
-| 1112001 | 王大明 | wang@nqu.edu.tw | 三年級 | 林教授 |
-| 1112002 | 李美麗 | lee@nqu.edu.tw | 三年級 | 林教授 |
-| 1113001 | 陳志偉 | chen@nqu.edu.tw | 二年級 | 張教授 |
-| 1113002 | 林小芳 | lin@nqu.edu.tw | 二年級 | 張教授 |
-| 1114001 | 張建宏 | chang@nqu.edu.tw | 四年級 | 王教授 |
-| 1114002 | 吳雅婷 | wu@nqu.edu.tw | 四年級 | 王教授 |
-| 1112003 | 黃俊賢 | huang@nqu.edu.tw | 三年級 | 林教授 |
-| 1113003 | 劉心如 | liu@nqu.edu.tw | 二年級 | 張教授 |
+| 學號 | 姓名 | Email | 就讀年級 | 指導教授 | 建立時間 |
+|------|------|-------|---------|---------|---------|
+| 1112001 | 王大明 | wang@nqu.edu.tw | 三年級 | 林教授 | 2026/03/01 |
+| 1112002 | 李美麗 | lee@nqu.edu.tw | 三年級 | 林教授 | 2026/03/02 |
+| 1113001 | 陳志偉 | chen@nqu.edu.tw | 二年級 | 張教授 | 2026/03/05 |
+| 1113002 | 林小芳 | lin@nqu.edu.tw | 二年級 | 張教授 | 2026/03/06 |
+| 1114001 | 張建宏 | chang@nqu.edu.tw | 四年級 | 王教授 | 2026/03/08 |
+| 1114002 | 吳雅婷 | wu@nqu.edu.tw | 四年級 | 王教授 | 2026/03/10 |
+| 1112003 | 黃俊賢 | huang@nqu.edu.tw | 三年級 | 林教授 | 2026/03/12 |
+| 1113003 | 劉心如 | liu@nqu.edu.tw | 二年級 | 張教授 | 2026/03/15 |
 
-<img width="620" height="219" alt="image" src="https://github.com/user-attachments/assets/28a5e064-bd3d-4956-b0e4-e32e4b12838e" />
+<img width="607" height="215" alt="image" src="https://github.com/user-attachments/assets/74ad6aac-e1e3-49c8-9c25-b4fe6d1cb637" />
 
 ---
 
@@ -548,7 +548,7 @@
 | E004 | 鴻海精密 | 電子製造 | 新北 | 廖副理 | hr@foxconn.com | 30000-35000 | 否 |
 | E005 | 聯發科 | IC設計 | 新竹 | 張副總 | hr@mediatek.com | 40000以上 | 是 |
 
-<img width="814" height="133" alt="image" src="https://github.com/user-attachments/assets/ec74138b-9105-482f-9a77-f836c802112d" />
+<img width="614" height="152" alt="image" src="https://github.com/user-attachments/assets/c0b0ba8f-d1e3-4fb3-987d-71d2ede6e5d1" />
 
 ---
 
@@ -565,7 +565,7 @@
 | A007 | 1112003 | E001 | 國內 | 2026/07/01 | 2026/09/30 | 待審核 | 2026/03/12 |
 | A008 | 1113003 | E003 | 自行開發 | 2026/07/01 | 2026/07/31 | 已核准 | 2026/03/15 |
 
-<img width="812" height="194" alt="image" src="https://github.com/user-attachments/assets/17c778c5-fb0a-435c-9edf-7daf77563f87" />
+<img width="576" height="216" alt="image" src="https://github.com/user-attachments/assets/cfca718c-ece4-4da3-bb3a-1bb464410c96" />
 
 ---
 
@@ -626,7 +626,7 @@ H2 — **計算實習天數**：
 
 把所有公式往下拖曳到第 9 列（8 筆資料）。
 
-<!-- 📸 截圖：view_applications 工作表，顯示跨表查詢結果 -->
+<img width="491" height="217" alt="image" src="https://github.com/user-attachments/assets/3481d3ef-9d41-4392-b8b8-145cb7335de5" />
 
 ---
 
