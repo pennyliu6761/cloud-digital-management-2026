@@ -918,14 +918,14 @@ Email 統一用 `LOWER`：
 ### 📌 任務 3-3：建立資料品質儀表板
 
 新建工作表 `quality_dashboard`，用公式自動計算資料品質指標：
+| 指標 | 數值 |
 |---|---|
-| 總筆數 | =COUNTA(dirty_data!A2:A6) |
-| 有空白姓名的筆數 | =COUNTIF(dirty_data!B2:B6, "") |
-| 學號格式錯誤 | =COUNTIF(dirty_data!A2:A6, "abc") |
-| 重複學號筆數 | =SUMPRODUCT((COUNTIF(dirty_data!A2:A6, dirty_data!A2:A6)>1)*1) | 
-| Email 包含 @ 的筆數 | =COUNTIF(dirty_data!C2:C6, "*@*") |
-| 資料完整率 | =TEXT((COUNTA(dirty_data!B2:B6)/COUNTA(dirty_data!A2:A6)), "0%") |
-```
+| 總筆數 | ```=COUNTA(dirty_data!A2:A6)``` |
+| 有空白姓名的筆數 | ```=COUNTIF(dirty_data!B2:B6, "")``` |
+| 學號格式錯誤 | ```=COUNTIF(dirty_data!A2:A6, "abc")``` |
+| 重複學號筆數 | ```=SUMPRODUCT((COUNTIF(dirty_data!A2:A6, dirty_data!A2:A6)>1)*1)``` | 
+| Email 包含 @ 的筆數 | ```=COUNTIF(dirty_data!C2:C6, "*@*")``` |
+| 資料完整率 | ```=TEXT((COUNTA(dirty_data!B2:B6)/COUNTA(dirty_data!A2:A6)), "0%")``` |
 
 <img width="244" height="157" alt="image" src="https://github.com/user-attachments/assets/3617b177-a755-4a02-b16d-1c1d9f5facd0" />
 
