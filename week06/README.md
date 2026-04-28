@@ -626,7 +626,7 @@ H2 — **計算實習天數**：
 
 把所有公式往下拖曳到第 9 列（8 筆資料）。
 
-<img width="491" height="217" alt="image" src="https://github.com/user-attachments/assets/3481d3ef-9d41-4392-b8b8-145cb7335de5" />
+<img width="489" height="216" alt="image" src="https://github.com/user-attachments/assets/83595068-baa7-4dfe-8e42-8c20690ce952" />
 
 ---
 
@@ -648,7 +648,8 @@ H2 — **計算實習天數**：
 - `ORDER BY H DESC`：依實習天數由多到少排序
 - `1`：第一列是標題列
 
-<!-- 📸 截圖：view_approved 工作表，顯示已核准名單 -->
+<img width="373" height="160" alt="image" src="https://github.com/user-attachments/assets/d787e719-181e-4d93-a613-652fa0e89336" />
+
 
 > [!NOTE]
 > **為什麼要用「視圖（View）」工作表？**
