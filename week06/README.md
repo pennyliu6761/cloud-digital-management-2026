@@ -684,9 +684,18 @@ H2 — **計算實習天數**：
 在 `view_applications` 工作表再新增兩個欄位：
 
 1. **指導教授**：從 `students` 表查詢（提示：VLOOKUP 回傳第 5 欄）
+
+```
+=VLOOKUP(B2,students!A:E,5)
+```
+
 2. **企業聯絡Email**：從 `companies` 表查詢（提示：VLOOKUP 回傳第 6 欄）
 
-截圖新增欄位後的完整 `view_applications` 工作表。
+```
+=VLOOKUP(D2, companies!A:F, 6, FALSE)
+```
+
+<img width="719" height="218" alt="image" src="https://github.com/user-attachments/assets/94804d71-a685-4d67-8d07-28c0a22b1c32" />
 
 ---
 
@@ -698,18 +707,42 @@ H2 — **計算實習天數**：
 **查詢一：各實習類型的申請人數統計**
 ```
 =QUERY(applications!A:H,
-  "SELECT E, COUNT(A)
-   GROUP BY E
-   LABEL COUNT(A) '申請人數'",
-  1)
+  "SELECT D, COUNT(A)
+   WHERE D IS NOT NULL
+   GROUP BY D
+   LABEL COUNT(A) '申請人數'",1)
 ```
+
+<img width="533" height="155" alt="image" src="https://github.com/user-attachments/assets/9e7e4def-2c2c-44ec-8200-ced731a8403b" />
 
 **查詢二：各企業的申請人數（用企業ID查，再用VLOOKUP換成企業名稱）**
 想想看：QUERY 的 GROUP BY 結果要怎麼再套一層 VLOOKUP？
-（提示：可以用 ARRAYFORMULA 或在旁邊另一欄用 VLOOKUP）
+```
+=QUERY(applications!A:H,
+  "SELECT C, COUNT(A)
+   WHERE C IS NOT NULL
+   GROUP BY C
+   LABEL COUNT(A) '申請人數'",1)
+```
+企業名稱資料欄位公式，後續複製公式即可
+```
+=VLOOKUP(D3, companies!A:B, 2, 0)
+```
 
 **查詢三：只顯示「三年級」學生的申請記錄**
 （提示：需要先在 view_applications 加入「就讀年級」欄位）
+```
+=QUERY(view_applications!A:I,
+  "SELECT A, B, C, E, F, H
+   WHERE I = '"&L1&"'
+   ORDER BY H
+   DESC", 1)
+```
+
+<img width="595" height="215" alt="image" src="https://github.com/user-attachments/assets/f85d94eb-e082-4677-baee-b1201bd80702" />
+
+<img width="500" height="135" alt="image" src="https://github.com/user-attachments/assets/7a9056a3-8a9d-49dd-a21f-993c0a8f51c4" />
+<img width="505" height="187" alt="image" src="https://github.com/user-attachments/assets/4dbc67ee-ac0c-473c-b3e5-30a94ca27384" />
 
 ---
 
