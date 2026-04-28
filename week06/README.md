@@ -135,7 +135,9 @@
 
 根據分析結果，設計以下三張表的欄位結構：
 
-**表一：學生資料表（students）**
+<img width="494" height="53" alt="image" src="https://github.com/user-attachments/assets/ab64483f-86de-4f1f-a2f2-449fc967376f" />
+
+**表一：students（學生資料表）**
 
 | 欄位名稱 | 資料類型 | 說明 |
 |---------|---------|------|
@@ -146,7 +148,7 @@
 | 指導教授 | Text | |
 | 建立時間 | Date | 學生資料建立日期 |
 
-**表二：企業資料表（companies）**
+**表二：companies（企業資料表）**
 
 | 欄位名稱 | 資料類型 | 說明 |
 |---------|---------|------|
@@ -159,7 +161,7 @@
 | 月薪範圍 | Text | |
 | 是否開放申請 | Text | 是/否 |
 
-**表三：申請記錄表（applications）**
+**表三：applications（申請記錄表）**
 
 | 欄位名稱 | 資料類型 | 說明 |
 |---------|---------|------|
@@ -211,7 +213,7 @@
 |------|--------|
 | 範圍 | `students!C2:C1000` |
 | 條件 | 自訂公式 |
-| 無效資料 | 顯示警告 |
+| 無效資料 | 拒絕輸入 |
  
 ```
 =AND(ISNUMBER(FIND("@",C2:C)), ISNUMBER(FIND(".",C2:C)))
@@ -255,61 +257,71 @@
  
 | 項目 | 設定值 |
 |------|--------|
-| 範圍 | `A2:A1000` |
+| 範圍 | `companies!A2:A1000` |
 | 條件 | 自訂公式 |
 | 無效資料 | 拒絕輸入 |
 | 說明文字 | 格式為 E 開頭加3位數字，例如：E001 |
  
 ```
-=AND(LEFT(A2,1)="E", LEN(A2)=4, ISNUMBER(VALUE(MID(A2,2,3))))
+=AND(LEFT(A2:A,1)="E", LEN(A2:A)=4, ISNUMBER(VALUE(MID(A2:A,2,3))))
 ```
- 
+
+<img width="946" height="618" alt="image" src="https://github.com/user-attachments/assets/30b1001a-ecff-4a08-9f67-f5a2a58edb76" />
+
 > ⚠️ **主鍵唯一性**：條件式格式 → 自訂公式，背景設為紅色
 > ```
 > =COUNTIF($A$2:$A$1000,A2)>1
 > ```
- 
+
+<img width="947" height="609" alt="image" src="https://github.com/user-attachments/assets/a4507ed5-da10-46f0-b704-554d9233c00b" />
+
 ---
  
 ### 聯絡Email（F欄）
  
 | 項目 | 設定值 |
 |------|--------|
-| 範圍 | `F2:F1000` |
+| 範圍 | `companies!F2:F1000` |
 | 條件 | 自訂公式 |
 | 無效資料 | 顯示警告 |
  
 ```
-=AND(ISNUMBER(FIND("@",F2)), ISNUMBER(FIND(".",F2)))
+=AND(ISNUMBER(FIND("@",F2:F)), ISNUMBER(FIND(".",F2:F)))
 ```
- 
+
+<img width="947" height="561" alt="image" src="https://github.com/user-attachments/assets/4fb5e906-a1e8-41c1-bc95-f05e964f1d4d" />
+
 ---
  
 ### 月薪範圍（G欄）
  
 | 項目 | 設定值 |
 |------|--------|
-| 範圍 | `G2:G1000` |
+| 範圍 | `companies!G2:G1000` |
 | 條件 | 下拉式選單（從清單） |
 | 無效資料 | 顯示警告 |
  
 ```
 25000以下,25000-30000,30000-35000,35000-40000,40000以上
 ```
- 
+
+<img width="942" height="802" alt="image" src="https://github.com/user-attachments/assets/eb373833-a988-4a5a-8649-0dc93c1dff8e" />
+
 ---
  
 ### 是否開放申請（H欄）
- 
+
 | 項目 | 設定值 |
 |------|--------|
-| 範圍 | `H2:H1000` |
+| 範圍 | `companies!H2:H1000` |
 | 條件 | 下拉式選單（從清單） |
 | 無效資料 | 拒絕輸入 |
- 
+
 ```
 是,否
 ```
+
+<img width="948" height="703" alt="image" src="https://github.com/user-attachments/assets/9fd7e46f-84dc-4df9-b6a5-8f21c10cde67" />
  
 ---
  
@@ -327,12 +339,16 @@
 ```
 =AND(LEFT(A2,1)="A", LEN(A2)=4, ISNUMBER(VALUE(MID(A2,2,3))))
 ```
- 
+
+<img width="947" height="611" alt="image" src="https://github.com/user-attachments/assets/de698d5c-9267-484a-98d1-9aa0c333e558" />
+
 > ⚠️ **主鍵唯一性**：條件式格式 → 自訂公式，背景設為紅色
 > ```
 > =COUNTIF($A$2:$A$1000,A2)>1
 > ```
- 
+
+<img width="952" height="607" alt="image" src="https://github.com/user-attachments/assets/5d684494-05c9-41c3-82b0-b6b00a650ad7" />
+
 ---
  
 ### 學號（B欄）— 外鍵 → students
@@ -347,7 +363,9 @@
 ```
 =AND(ISNUMBER(VALUE(B2)), LEN(B2)=7, COUNTIF(students!$A$2:$A$1000,B2)>0)
 ```
- 
+
+<img width="953" height="620" alt="image" src="https://github.com/user-attachments/assets/e0ece4b8-b43d-4954-a45f-a7630a731abf" />
+
 ---
  
 ### 企業ID（C欄）— 外鍵 → companies
@@ -362,7 +380,9 @@
 ```
 =AND(LEFT(C2,1)="E", LEN(C2)=4, COUNTIF(companies!$A$2:$A$1000,C2)>0)
 ```
- 
+
+<img width="946" height="615" alt="image" src="https://github.com/user-attachments/assets/fc9ce76e-8d52-48f1-9dba-00f50f0e5ba3" />
+
 ---
  
 ### 實習類型（D欄）
@@ -376,7 +396,9 @@
 ```
 國內,海外,自行開發
 ```
- 
+
+<img width="942" height="543" alt="image" src="https://github.com/user-attachments/assets/6610b9d4-faa6-44d9-b157-6a25c485351c" />
+
 ---
  
 ### 開始日期（E欄）／ 結束日期（F欄）
@@ -391,7 +413,11 @@
 > ```
 > =AND(ISNUMBER(F2), F2>E2)
 > ```
- 
+
+<img width="943" height="505" alt="image" src="https://github.com/user-attachments/assets/4ae7fff4-94d2-4207-83b4-cb6270223b12" />
+<img width="948" height="519" alt="image" src="https://github.com/user-attachments/assets/6b1b1cb2-5064-4f5c-89d9-6010fbd20200" />
+<img width="948" height="620" alt="image" src="https://github.com/user-attachments/assets/a49cbdfa-3d1e-4d0f-b25f-e6f721d2b3c8" />
+
 ---
  
 ### 審核狀態（G欄）
@@ -405,7 +431,9 @@
 ```
 待審核,已核准,退件
 ```
- 
+
+<img width="951" height="542" alt="image" src="https://github.com/user-attachments/assets/0c982424-0594-47b6-b854-b40c63e9cd0e" />
+
 ---
  
 ### 申請時間（H欄）
@@ -415,7 +443,9 @@
 | 範圍 | `H2:H1000` |
 | 條件 | 日期 → 是有效的日期 |
 | 無效資料 | 拒絕輸入 |
- 
+
+<img width="953" height="514" alt="image" src="https://github.com/user-attachments/assets/94546ca6-23b5-4e84-9016-6bd8f48abbbe" />
+
 ---
 
 > [!TIP]
