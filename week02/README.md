@@ -581,14 +581,14 @@
 在試算表空白區建立統計表(實習類型&人數)
 **M2** 輸入 - 挑選不重複資料
 ```
-=UNIQUE($C:$C)
+=UNIQUE($C2:$C)
 ```
 
 <img width="366" height="160" alt="image" src="https://github.com/user-attachments/assets/dfbe64a6-868a-4538-ade8-8e47bba14360" />
 
 **N2** 輸入 - 計算吻合條件的次數
 ```
-=COUNTIF($C:$C, M2)
+=COUNTIF($C2:$C, M2)
 ```
 
 <img width="329" height="146" alt="image" src="https://github.com/user-attachments/assets/3a18d750-8539-4fab-89ee-184b6604e0a0" />
@@ -602,7 +602,7 @@
 
 統計「已核准的國內企業實習」人數：
 ```
-=COUNTIFS($C:$C, "國內企業", $H:$H, "已核准")
+=COUNTIFS($C2:$C, "國內企業", $H2:$H, "已核准")
 ```
 **用途：** `COUNTIF` 的進階版，可同時設定多個條件。
 
@@ -614,7 +614,7 @@
 
 計算「已核准」學生的薪資總額：
 ```
-=SUMIF($H:$H, "已核准", $G:$G)
+=SUMIF($H2:$H, "已核准", $G:$G)
 ```
 
 <img width="432" height="104" alt="image" src="https://github.com/user-attachments/assets/582b8b17-b7db-41ae-b881-a5dce23303d8" />
@@ -625,7 +625,7 @@
 
 計算「海外實習」的平均薪資：
 ```
-=AVERAGEIF($C:$C, "海外實習", $G:$G)
+=AVERAGEIF($C2:$C, "海外實習", $G2:$G)
 ```
 
 <img width="579" height="117" alt="image" src="https://github.com/user-attachments/assets/4e68561a-b099-4ad8-933b-cd6c03dc6a1a" />
