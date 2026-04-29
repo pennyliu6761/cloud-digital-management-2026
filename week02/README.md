@@ -591,8 +591,7 @@
 =COUNTIF($C2:$C, M2)
 ```
 
-<img width="329" height="146" alt="image" src="https://github.com/user-attachments/assets/3a18d750-8539-4fab-89ee-184b6604e0a0" />
-
+<img width="1055" height="359" alt="image" src="https://github.com/user-attachments/assets/9c66b27c-a8eb-453a-a4c7-62e3c01c138b" />
 
 **用途：** 立刻知道各類型各有幾人，不需要手動數。
 
