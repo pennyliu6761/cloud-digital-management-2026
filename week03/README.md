@@ -513,6 +513,10 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
 
 <img width="651" height="441" alt="image" src="https://github.com/user-attachments/assets/38629cc2-46c2-4b36-bd09-56f6ab907cf4" />
 
+**故障排除**
+<img width="929" height="557" alt="image" src="https://github.com/user-attachments/assets/09d5c0c6-95f9-4466-aae3-dd909ddb4e7e" />
+<img width="509" height="889" alt="image" src="https://github.com/user-attachments/assets/4941f731-91f2-4989-b25b-17076b7ce921" />
+
 ---
 
 ### 📌 任務 3-2：製造錯誤來測試！
@@ -554,9 +558,12 @@ Make 會在 OCR 節點下方出現一條**紅色的錯誤路線**。
 1. 新建劇本
 2. 觸發器選 **Google Sheets → Watch Changes**（不是 Watch New Rows）
 
-<img width="706" height="593" alt="image" src="https://github.com/user-attachments/assets/d15f7de4-9467-4de0-acea-d9d09c93b650" />
+複製Webhook(from Make)
+<img width="679" height="586" alt="image" src="https://github.com/user-attachments/assets/1937facc-2ddd-4a60-8d47-ba3e12937931" />
+以試算表為主安裝擴充套件(Make)
 <img width="1419" height="567" alt="image" src="https://github.com/user-attachments/assets/4a73b99e-d793-490b-ad2e-57f685d402a3" />
-<img width="1866" height="942" alt="image" src="https://github.com/user-attachments/assets/385c260d-891f-416d-9f4b-d75adfb223b9" />
+以Make複製的Webhook取代試算表預設的
+<img width="1233" height="692" alt="image" src="https://github.com/user-attachments/assets/7c8ea1a2-5ed9-48b4-ae41-a24b3cf13449" />
 
 3. 設定：
 
